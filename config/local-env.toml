@@ -1,0 +1,7 @@
+
+[database]
+Name = "real_world"
+Host = "localhost"
+Port = 3306
+User = "dev"
+Password = "!gktrlagh33"
