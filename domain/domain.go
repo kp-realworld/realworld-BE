@@ -3,7 +3,6 @@ package domain
 import (
 	"fmt"
 	"github.com/hotkimho/realworld-api/env"
-	"github.com/hotkimho/realworld-api/models"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -21,16 +20,14 @@ func Init() error {
 	if dsn == "" {
 		return fmt.Errorf("dsn is empty")
 	}
-	fmt.Println("f: ", dsn)
+
 	//	dsn = "dev:!gktrlagh33@tcp(127.0.0.1:3306)/real_world?charset=utf8mb4&parseTime=True&loc=Local"
-	fmt.Println("b: ", dsn)
-	DB, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+
+	var err error
+	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return err
 	}
-
-	user := models.Users{ID: "kimho", Username: "김호"}
-	DB.Create(&user)
 
 	return nil
 }

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/hotkimho/realworld-api/domain"
 	"github.com/hotkimho/realworld-api/env"
+	"github.com/hotkimho/realworld-api/router"
+	"net/http"
 )
 
 func main() {
@@ -12,7 +14,6 @@ func main() {
 	config := flag.String("config", "env/local-env.toml", "config file path")
 	flag.Parse()
 
-	fmt.Println(*config)
 	if err := env.SetConfig(*config); err != nil {
 		fmt.Println(err)
 		return
@@ -22,14 +23,12 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	//viper.SetConfigFile("env/local-env.toml")
-	////viper.AddConfigPath("env")
-	////viper.SetConfigType("toml")
-	//
-	//if err := viper.ReadInConfig(); err != nil {
-	//	panic(fmt.Errorf("Fatal error config file: %s", err))
-	//}
 
-	fmt.Println("에러 안남 ㅋㅋ")
+	var router router.Router
+	router.Init()
+
+	//router.Handle("/heartbeat", authMiddleware(TestFunc)).Methods("GET")
+
+	http.ListenAndServe(":8080", router.Server)
 	//fmt.Println(viper.GetString("database.host"))
 }
