@@ -21,7 +21,7 @@ var Config ConfigSetting
 
 func SetConfig(filepath string) error {
 	//path, _ := os.Getwd()
-
+	fmt.Println(filepath)
 	if filepath == "" {
 		filepath = "config/local-env.toml"
 	}

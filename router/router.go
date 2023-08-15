@@ -3,6 +3,8 @@ package router
 import (
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/hotkimho/realworld-api/controller"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
 )
 
@@ -13,12 +15,14 @@ type Router struct {
 func (m *Router) Init() {
 	m.Server = mux.NewRouter()
 
+	m.InitSwagger()
+
 	m.AddRoute([][]*Route{
 		{
 			{
 				Method:      "GET",
 				Path:        "/heartbeat",
-				HandlerFunc: TestFunc,
+				HandlerFunc: controller.TestFunc,
 				Middleware:  authMiddleware,
 			},
 		},
@@ -37,16 +41,21 @@ func (m *Router) AddRoute(routeMaps [][]*Route) {
 	}
 }
 
+func (m *Router) InitSwagger() {
+	m.Server.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
+		httpSwagger.URL("http://localhost:8080/swagger/doc.json"), //The url pointing to API definition
+		httpSwagger.DeepLinking(true),
+		httpSwagger.DocExpansion("none"),
+		httpSwagger.DomID("swagger-ui"),
+	)).Methods(http.MethodGet)
+}
+
 type Middleware func(http.HandlerFunc) http.Handler
 type Route struct {
 	Method      string
 	Path        string
 	HandlerFunc http.HandlerFunc
 	Middleware  Middleware
-}
-
-func TestFunc(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("test")
 }
 
 func authMiddleware(next http.HandlerFunc) http.Handler {
