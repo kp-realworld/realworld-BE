@@ -5,3 +5,9 @@ Host = "localhost"
 Port = 3306
 User = "root"
 Password = "!gktrlagh33"
+
+[redis]
+Host = "localhost"
+Port = 6379
+Password = ""
+DB = 0

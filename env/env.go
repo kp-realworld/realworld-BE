@@ -13,8 +13,16 @@ type DatabaseSetting struct {
 	Name     string
 }
 
+type RedisSetting struct {
+	Host     string
+	Port     int
+	Password string
+	DB       int
+}
+
 type ConfigSetting struct {
 	Database DatabaseSetting `toml:"database"`
+	Redis    RedisSetting    `toml:"redis"`
 }
 
 var Config ConfigSetting
