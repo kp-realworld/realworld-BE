@@ -20,7 +20,7 @@ func (m *Router) Init() {
 	m.AddRoute([][]*Route{
 		{
 			{
-				Method:      "GET",
+				Method:      "POST",
 				Path:        "/heartbeat",
 				HandlerFunc: controller.TestFunc,
 				Middleware:  authMiddleware,
@@ -32,6 +32,7 @@ func (m *Router) Init() {
 func (m *Router) AddRoute(routeMaps [][]*Route) {
 	for _, routeMap := range routeMaps {
 		for _, route := range routeMap {
+			// 미들웨어 있는 경우 처리
 			if route.Middleware != nil {
 				m.Server.Handle(route.Path, route.Middleware(route.HandlerFunc)).Methods(route.Method)
 			} else {

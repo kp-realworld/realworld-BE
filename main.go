@@ -43,8 +43,8 @@ func main() {
 	var router router.Router
 	router.Init()
 
-	//router.Handle("/heartbeat", authMiddleware(TestFunc)).Methods("GET")
-
+	fmt.Println("start server :8080")
 	http.ListenAndServe(":8080", router.Server)
+	fmt.Println("end server :8080")
 	//fmt.Println(viper.GetString("database.host"))
 }

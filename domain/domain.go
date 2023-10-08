@@ -34,3 +34,11 @@ func Init() error {
 func makeDSN(user, password, host, name string, port int) string {
 	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", user, password, host, port, name)
 }
+
+type UserDomain struct{}
+
+var Users UserDomain
+
+func init() {
+	//Users = UserDomain{}
+}

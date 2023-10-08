@@ -3,5 +3,5 @@
 Name = "real_world"
 Host = "localhost"
 Port = 3306
-User = "dev"
+User = "root"
 Password = "!gktrlagh33"
