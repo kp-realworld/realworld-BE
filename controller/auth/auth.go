@@ -80,3 +80,8 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 
 	responder.Response(w, http.StatusOK, "success")
 }
+
+func Heartbeat(w http.ResponseWriter, r *http.Request) {
+
+	responder.Response(w, http.StatusOK, "success")
+}

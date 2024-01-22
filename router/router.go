@@ -31,6 +31,12 @@ func (m *Router) Init() {
 				HandlerFunc: auth.SignIn,
 				Middleware:  authMiddleware,
 			},
+			{
+				Method:      "GET",
+				Path:        "/heartbeat",
+				HandlerFunc: auth.Heartbeat,
+				Middleware:  authMiddleware,
+			},
 		},
 	})
 }
