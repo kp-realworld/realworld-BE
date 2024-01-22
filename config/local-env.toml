@@ -1,10 +1,10 @@
 
 [database]
-Name = "real_world"
-Host = "localhost"
+Name = "realworld-dev"
+Host = "realworld.cz9z95hgjl9q.ap-northeast-2.rds.amazonaws.com"
 Port = 3306
 User = "root"
-Password = "!gktrlagh33"
+Password = ""
 
 [redis]
 Host = "localhost"

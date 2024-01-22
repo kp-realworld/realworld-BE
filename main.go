@@ -4,8 +4,8 @@ import (
 	"flag"
 	"fmt"
 	_ "github.com/hotkimho/realworld-api/docs"
-	"github.com/hotkimho/realworld-api/domain"
 	"github.com/hotkimho/realworld-api/env"
+	"github.com/hotkimho/realworld-api/repository"
 	"github.com/hotkimho/realworld-api/router"
 	//_ "github.com/swaggo/http-swagger/example/gorilla/docs"
 	"net/http"
@@ -35,7 +35,7 @@ func main() {
 		return
 	}
 
-	if err := domain.Init(); err != nil {
+	if err := repository.Init(); err != nil {
 		fmt.Println(err)
 		return
 	}

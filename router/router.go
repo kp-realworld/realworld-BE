@@ -3,7 +3,7 @@ package router
 import (
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/hotkimho/realworld-api/controller"
+	"github.com/hotkimho/realworld-api/controller/auth"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
 )
@@ -21,8 +21,8 @@ func (m *Router) Init() {
 		{
 			{
 				Method:      "POST",
-				Path:        "/heartbeat",
-				HandlerFunc: controller.TestFunc,
+				Path:        "/user/signup",
+				HandlerFunc: auth.CreateUser,
 				Middleware:  authMiddleware,
 			},
 		},
