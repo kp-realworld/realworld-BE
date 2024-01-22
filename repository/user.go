@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"github.com/hotkimho/realworld-api/models"
 	"gorm.io/gorm"
 )
@@ -13,10 +14,26 @@ func NewUserRepository() *userRepository {
 
 func (repo *userRepository) Create(db *gorm.DB, user models.User) (int64, error) {
 
-	result := DB.Create(&user)
-	if result.Error != nil {
-		return 0, result.Error
+	err := db.Create(&user)
+	if err.Error != nil {
+		return 0, err.Error
 	}
 
 	return user.ID, nil
+}
+
+func (repo *userRepository) GetByEmail(db *gorm.DB, email string) (*models.User, error) {
+
+	var user models.User
+
+	err := db.Where("email = ?", email).First(&user)
+	if err.Error != nil {
+		if errors.Is(err.Error, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+
+		return nil, err.Error
+	}
+
+	return &user, nil
 }

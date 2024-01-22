@@ -22,7 +22,13 @@ func (m *Router) Init() {
 			{
 				Method:      "POST",
 				Path:        "/user/signup",
-				HandlerFunc: auth.CreateUser,
+				HandlerFunc: auth.SignUp,
+				Middleware:  authMiddleware,
+			},
+			{
+				Method:      "POST",
+				Path:        "/user/signin",
+				HandlerFunc: auth.SignIn,
 				Middleware:  authMiddleware,
 			},
 		},
