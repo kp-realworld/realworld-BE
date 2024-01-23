@@ -11,3 +11,9 @@ type SignInRequestDTO struct {
 	Email    string `json:"email" validate:"required"`
 	Password string `json:"password" validate:"required"`
 }
+
+type SignInResponseDTO struct {
+	Email    string `json:"email"`
+	Username string `json:"username"`
+	Token    string `json:"token"`
+}

@@ -3,6 +3,7 @@ package env
 import (
 	"fmt"
 	"github.com/spf13/viper"
+	"time"
 )
 
 type DatabaseSetting struct {
@@ -20,12 +21,22 @@ type RedisSetting struct {
 	DB       int
 }
 
+type AuthSetting struct {
+	Secret             string
+	RefreshTokenExpire int
+	AccessTokenExpire  int
+	Issuer             string
+}
+
 type ConfigSetting struct {
 	Database DatabaseSetting `toml:"database"`
 	Redis    RedisSetting    `toml:"redis"`
+	Auth     AuthSetting     `toml:"auth"`
 }
 
 var Config ConfigSetting
+
+var Seoul *time.Location
 
 func SetConfig(filepath string) error {
 	//path, _ := os.Getwd()
@@ -45,6 +56,15 @@ func SetConfig(filepath string) error {
 		return err
 	}
 
-	fmt.Println(Config.Database)
+	return nil
+}
+
+func InitTimeZone() error {
+	var err error
+	Seoul, err = time.LoadLocation("Asia/Seoul")
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

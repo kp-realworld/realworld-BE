@@ -35,6 +35,11 @@ func main() {
 		return
 	}
 
+	if err := env.InitTimeZone(); err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	if err := repository.Init(); err != nil {
 		fmt.Println(err)
 		return
@@ -44,7 +49,7 @@ func main() {
 	router.Init()
 
 	fmt.Println("start server :8080")
-	http.ListenAndServe(":8080", router.Server)
+	http.ListenAndServe(":8080", router.CorsHandle.Handler(router.Server))
 	fmt.Println("end server :8080")
 	//fmt.Println(viper.GetString("database.host"))
 }
