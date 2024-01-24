@@ -1,4 +1,20 @@
 basePath: /v2
+definitions:
+  auth.SignUpRequestDTO:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
 host: petstore.swagger.io
 info:
   contact:
@@ -12,5 +28,31 @@ info:
   termsOfService: http://swagger.io/terms/
   title: Swagger Example API
   version: "1.0"
-paths: {}
+paths:
+  /user/signup:
+    post:
+      consumes:
+      - application/json
+      description: 회원가입 des
+      parameters:
+      - description: signUpReq
+        in: body
+        name: signUpReq
+        required: true
+        schema:
+          $ref: '#/definitions/auth.SignUpRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            type: string
+        "400":
+          description: bad request
+          schema:
+            type: string
+      summary: 회원가입 sum
+      tags:
+      - Auth tag
 swagger: "2.0"

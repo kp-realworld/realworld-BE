@@ -12,6 +12,15 @@ import (
 	"net/http"
 )
 
+// @Summary 회원가입 sum
+// @Description 회원가입 des
+// @Tags Auth tag
+// @Accept json
+// @Produce json
+// @Param signUpReq body SignUpRequestDTO true "signUpReq"
+// @Success 200 {string} string "success"
+// @Failure 400 {string} string "bad request"
+// @Router /user/signup [post]
 func SignUp(w http.ResponseWriter, r *http.Request) {
 
 	var signUpReq SignUpRequestDTO
