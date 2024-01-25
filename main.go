@@ -7,6 +7,8 @@ import (
 	"github.com/hotkimho/realworld-api/env"
 	"github.com/hotkimho/realworld-api/repository"
 	"github.com/hotkimho/realworld-api/router"
+	"github.com/sirupsen/logrus"
+
 	//_ "github.com/swaggo/http-swagger/example/gorilla/docs"
 	"net/http"
 )
@@ -44,6 +46,9 @@ func main() {
 		fmt.Println(err)
 		return
 	}
+
+	logrus.SetFormatter(&logrus.JSONFormatter{})
+	logrus.SetLevel(logrus.DebugLevel)
 
 	var router router.Router
 	router.Init()

@@ -4,7 +4,16 @@ type SignUpRequestDTO struct {
 	Username string `json:"username" validate:"required"`
 	Email    string `json:"email" validate:"required"`
 	Password string `json:"password" validate:"required"`
-	Name     string `json:"name"`
+}
+
+type SignUpResponseDTO struct {
+	UserID   int64  `json:"user_id,omitempty"`
+	Username string `json:"username,omitempty"`
+	Email    string `json:"email,omitempty"`
+}
+
+type SignUpResponseWrapperDTO struct {
+	User SignUpResponseDTO `json:"user"`
 }
 
 type SignInRequestDTO struct {
@@ -13,7 +22,11 @@ type SignInRequestDTO struct {
 }
 
 type SignInResponseDTO struct {
-	Email    string `json:"email"`
-	Username string `json:"username"`
+	UserID   int64  `json:"user_id,omitempty"`
+	Username string `json:"username,omitempty"`
 	Token    string `json:"token"`
+}
+
+type SignInResponseWrapperDTO struct {
+	User SignInResponseDTO `json:"user"`
 }

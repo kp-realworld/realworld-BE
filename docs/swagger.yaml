@@ -1,10 +1,32 @@
 basePath: /v2
 definitions:
-  auth.SignUpRequestDTO:
+  auth.SignInRequestDTO:
     properties:
       email:
         type: string
-      name:
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  auth.SignInResponseDTO:
+    properties:
+      token:
+        type: string
+      user_id:
+        type: integer
+      username:
+        type: string
+    type: object
+  auth.SignInResponseWrapperDTO:
+    properties:
+      user:
+        $ref: '#/definitions/auth.SignInResponseDTO'
+    type: object
+  auth.SignUpRequestDTO:
+    properties:
+      email:
         type: string
       password:
         type: string
@@ -14,6 +36,69 @@ definitions:
     - email
     - password
     - username
+    type: object
+  auth.SignUpResponseDTO:
+    properties:
+      email:
+        type: string
+      user_id:
+        type: integer
+      username:
+        type: string
+    type: object
+  auth.SignUpResponseWrapperDTO:
+    properties:
+      user:
+        $ref: '#/definitions/auth.SignUpResponseDTO'
+    type: object
+  types.ErrorDetail:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  types.ErrorResponse:
+    properties:
+      error:
+        $ref: '#/definitions/types.ErrorDetail'
+    type: object
+  user.ReadUserProfileResponseDTO:
+    properties:
+      bio:
+        type: string
+      profile_image:
+        type: string
+      username:
+        type: string
+    type: object
+  user.ReadUserProfileResponseWrapperDTO:
+    properties:
+      user:
+        $ref: '#/definitions/user.ReadUserProfileResponseDTO'
+    type: object
+  user.UpdateUserProfileRequestDTO:
+    properties:
+      bio:
+        type: string
+      profile_image:
+        type: string
+      username:
+        type: string
+    type: object
+  user.UpdateUserProfileResponseDTO:
+    properties:
+      bio:
+        type: string
+      profile_image:
+        type: string
+      username:
+        type: string
+    type: object
+  user.UpdateUserProfileResponseWrapperDTO:
+    properties:
+      user:
+        $ref: '#/definitions/user.UpdateUserProfileResponseDTO'
     type: object
 host: petstore.swagger.io
 info:
@@ -29,11 +114,110 @@ info:
   title: Swagger Example API
   version: "1.0"
 paths:
+  /user/{user_id}/profile:
+    get:
+      consumes:
+      - application/json
+      description: Read user profile
+      parameters:
+      - description: user_id
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/user.ReadUserProfileResponseWrapperDTO'
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+        "500":
+          description: network error
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: Read user profile
+      tags:
+      - User tag
+    put:
+      consumes:
+      - application/json
+      description: Update user profile
+      parameters:
+      - description: user_id
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: updateUserProfileReq
+        in: body
+        name: updateUserProfileReq
+        required: true
+        schema:
+          $ref: '#/definitions/user.UpdateUserProfileRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/user.UpdateUserProfileResponseWrapperDTO'
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+        "500":
+          description: network error
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: Update user profile
+      tags:
+      - User tag
+  /user/signin:
+    post:
+      consumes:
+      - application/json
+      description: 로그인
+      parameters:
+      - description: signInReq
+        in: body
+        name: signInReq
+        required: true
+        schema:
+          $ref: '#/definitions/auth.SignInRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/auth.SignInResponseWrapperDTO'
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: 로그인
+      tags:
+      - Auth tag
   /user/signup:
     post:
       consumes:
       - application/json
-      description: 회원가입 des
+      description: 회원가입
       parameters:
       - description: signUpReq
         in: body
@@ -44,15 +228,15 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
+        "201":
           description: success
           schema:
-            type: string
+            $ref: '#/definitions/auth.SignUpResponseWrapperDTO'
         "400":
           description: bad request
           schema:
-            type: string
-      summary: 회원가입 sum
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: 회원가입
       tags:
       - Auth tag
 swagger: "2.0"
