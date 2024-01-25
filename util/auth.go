@@ -9,11 +9,11 @@ import (
 )
 
 // 로그인 시, jwt 토큰 발급 함수
-func IssueJWT(userID string) (string, error) {
-	if userID == "" {
+func IssueJWT(userID int64) (string, error) {
+	if userID <= 0 {
 		return "", errors.New("user id is empty")
 	}
-	
+
 	now := time.Now().In(env.Seoul)
 	ExpiredTime := now.Add(time.Hour * time.Duration(env.Config.Auth.AccessTokenExpire))
 	claims := types.JWTClaims{

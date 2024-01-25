@@ -4,6 +4,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
 	"github.com/hotkimho/realworld-api/controller/auth"
+	"github.com/hotkimho/realworld-api/controller/user"
 	"github.com/hotkimho/realworld-api/env"
 	"github.com/hotkimho/realworld-api/types"
 	"github.com/rs/cors"
@@ -38,6 +39,18 @@ func (m *Router) Init() {
 				Method:      "GET",
 				Path:        "/heartbeat",
 				HandlerFunc: auth.Heartbeat,
+			},
+			{
+				Method:      "GET",
+				Path:        "/user/{user_id}/profile",
+				HandlerFunc: user.ReadUserProfile,
+				Middleware:  authMiddleware,
+			},
+			{
+				Method:      "PUT",
+				Path:        "/user/{user_id}/profile",
+				HandlerFunc: user.UpdateUserProfile,
+				Middleware:  authMiddleware,
 			},
 		},
 	})

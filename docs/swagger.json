@@ -18,9 +18,9 @@
     "host": "petstore.swagger.io",
     "basePath": "/v2",
     "paths": {
-        "/user/signup": {
+        "/user/signin": {
             "post": {
-                "description": "회원가입 des",
+                "description": "로그인",
                 "consumes": [
                     "application/json"
                 ],
@@ -30,7 +30,47 @@
                 "tags": [
                     "Auth tag"
                 ],
-                "summary": "회원가입 sum",
+                "summary": "로그인",
+                "parameters": [
+                    {
+                        "description": "signInReq",
+                        "name": "signInReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.SignInRequestDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/auth.SignInResponseWrapperDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/signup": {
+            "post": {
+                "description": "회원가입",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth tag"
+                ],
+                "summary": "회원가입",
                 "parameters": [
                     {
                         "description": "signUpReq",
@@ -43,16 +83,125 @@
                     }
                 ],
                 "responses": {
-                    "200": {
+                    "201": {
                         "description": "success",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/auth.SignUpResponseWrapperDTO"
                         }
                     },
                     "400": {
                         "description": "bad request",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/{user_id}/profile": {
+            "get": {
+                "description": "Read user profile",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User tag"
+                ],
+                "summary": "Read user profile",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "user_id",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/user.ReadUserProfileResponseWrapperDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "network error",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update user profile",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User tag"
+                ],
+                "summary": "Update user profile",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "user_id",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "updateUserProfileReq",
+                        "name": "updateUserProfileReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.UpdateUserProfileRequestDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/user.UpdateUserProfileResponseWrapperDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "network error",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
                         }
                     }
                 }
@@ -60,6 +209,43 @@
         }
     },
     "definitions": {
+        "auth.SignInRequestDTO": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "auth.SignInResponseDTO": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "auth.SignInResponseWrapperDTO": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "$ref": "#/definitions/auth.SignInResponseDTO"
+                }
+            }
+        },
         "auth.SignUpRequestDTO": {
             "type": "object",
             "required": [
@@ -71,14 +257,110 @@
                 "email": {
                     "type": "string"
                 },
-                "name": {
-                    "type": "string"
-                },
                 "password": {
                     "type": "string"
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "auth.SignUpResponseDTO": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "auth.SignUpResponseWrapperDTO": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "$ref": "#/definitions/auth.SignUpResponseDTO"
+                }
+            }
+        },
+        "types.ErrorDetail": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "types.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "$ref": "#/definitions/types.ErrorDetail"
+                }
+            }
+        },
+        "user.ReadUserProfileResponseDTO": {
+            "type": "object",
+            "properties": {
+                "bio": {
+                    "type": "string"
+                },
+                "profile_image": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.ReadUserProfileResponseWrapperDTO": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "$ref": "#/definitions/user.ReadUserProfileResponseDTO"
+                }
+            }
+        },
+        "user.UpdateUserProfileRequestDTO": {
+            "type": "object",
+            "properties": {
+                "bio": {
+                    "type": "string"
+                },
+                "profile_image": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.UpdateUserProfileResponseDTO": {
+            "type": "object",
+            "properties": {
+                "bio": {
+                    "type": "string"
+                },
+                "profile_image": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "user.UpdateUserProfileResponseWrapperDTO": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "$ref": "#/definitions/user.UpdateUserProfileResponseDTO"
                 }
             }
         }
