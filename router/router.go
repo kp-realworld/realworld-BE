@@ -75,8 +75,9 @@ func (m *Router) AddRoute(routeMaps [][]*Route) {
 }
 
 func (m *Router) InitSwagger() {
+	fmt.Println(env.Config.Swagger.Host)
 	m.Server.PathPrefix("/swagger/").Handler(httpSwagger.Handler(
-		httpSwagger.URL("http://localhost:8080/swagger/doc.json"), //The url pointing to API definition
+		httpSwagger.URL(env.Config.Swagger.Host), //The url pointing to API definition
 		httpSwagger.DeepLinking(true),
 		httpSwagger.DocExpansion("none"),
 		httpSwagger.DomID("swagger-ui"),
@@ -91,6 +92,8 @@ func (m *Router) InitCORS() {
 			"https://localhost:3000",
 			"http://localhost:5173",
 			"https://localhost:5173",
+			"http://kp-realworld.com",
+			"https://kp-realworld.com",
 			"http://*.kp-realworld.com",
 			"https://*.kp-realworld.com",
 		},

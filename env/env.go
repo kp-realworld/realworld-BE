@@ -28,10 +28,15 @@ type AuthSetting struct {
 	Issuer             string
 }
 
+type SwaggerSetting struct {
+	Host string
+}
+
 type ConfigSetting struct {
 	Database DatabaseSetting `toml:"database"`
 	Redis    RedisSetting    `toml:"redis"`
 	Auth     AuthSetting     `toml:"auth"`
+	Swagger  SwaggerSetting  `toml:"swagger"`
 }
 
 var Config ConfigSetting
