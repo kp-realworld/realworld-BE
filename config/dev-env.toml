@@ -1,0 +1,23 @@
+
+[database]
+Name = "realworld-dev"
+Host = "realworld.cz9z95hgjl9q.ap-northeast-2.rds.amazonaws.com"
+Port = 3306
+User = "root"
+Password = ""
+
+[redis]
+Host = "localhost"
+Port = 6379
+Password = ""
+DB = 0
+
+[auth]
+# 리프레시 토큰 만료 기간, 액세스 토큰 만료 기간
+RefreshTokenExpire = 144
+AccessTokenExpire = 24
+Secret = "0b6e149dd96b303e824a2aed87f14dc4"
+Issuer = "dev-kp-realworld"
+
+[swagger]
+Host = "https://api.kp-realworld.com/swagger/doc.json"
