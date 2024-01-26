@@ -5,6 +5,6 @@ import (
 	"github.com/hotkimho/realworld-api/controller/dto/user"
 )
 
-func ValidateUpdateUserProfileRequestDTO(requestDTO user.UpdateUserProfileRequestDTO) error {
+func ValidateUpdateUserProfileRequestDTO(requestDTO userdto.UpdateUserProfileRequestDTO) error {
 	return controller.Validate.Struct(requestDTO)
 }

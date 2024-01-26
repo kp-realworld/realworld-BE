@@ -2,15 +2,15 @@ package responder
 
 import (
 	"encoding/json"
-	. "github.com/hotkimho/realworld-api/controller/dto/user"
+	"github.com/hotkimho/realworld-api/controller/dto/user"
 	"github.com/hotkimho/realworld-api/models"
 	"net/http"
 )
 
 func ReadUserProfileResponse(w http.ResponseWriter, user models.User) {
 
-	wrapper := ReadUserProfileResponseWrapperDTO{
-		User: ReadUserProfileResponseDTO{
+	wrapper := userdto.ReadUserProfileResponseWrapperDTO{
+		User: userdto.ReadUserProfileResponseDTO{
 			Username:     user.Username,
 			Bio:          user.Bio,
 			ProfileImage: user.ProfileImage,
@@ -30,8 +30,8 @@ func ReadUserProfileResponse(w http.ResponseWriter, user models.User) {
 
 func UpdateUserProfileResponse(w http.ResponseWriter, user models.User) {
 
-	wrapper := UpdateUserProfileResponseWrapperDTO{
-		User: UpdateUserProfileResponseDTO{
+	wrapper := userdto.UpdateUserProfileResponseWrapperDTO{
+		User: userdto.UpdateUserProfileResponseDTO{
 			Username:     user.Username,
 			Bio:          user.Bio,
 			ProfileImage: user.ProfileImage,

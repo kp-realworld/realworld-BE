@@ -1,11 +1,13 @@
 package router
 
 import (
+	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
 	"github.com/hotkimho/realworld-api/controller/auth"
 	"github.com/hotkimho/realworld-api/controller/user"
 	"github.com/hotkimho/realworld-api/env"
+	"github.com/hotkimho/realworld-api/responder"
 	"github.com/hotkimho/realworld-api/types"
 	"github.com/rs/cors"
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -44,13 +46,13 @@ func (m *Router) Init() {
 				Method:      "GET",
 				Path:        "/user/{user_id}/profile",
 				HandlerFunc: user.ReadUserProfile,
-				Middleware:  authMiddleware,
+				Middleware:  []Middleware{AuthMiddleware},
 			},
 			{
 				Method:      "PUT",
 				Path:        "/user/{user_id}/profile",
 				HandlerFunc: user.UpdateUserProfile,
-				Middleware:  authMiddleware,
+				//Middleware:  []Middleware{authMiddleware},
 			},
 		},
 	})
@@ -59,12 +61,15 @@ func (m *Router) Init() {
 func (m *Router) AddRoute(routeMaps [][]*Route) {
 	for _, routeMap := range routeMaps {
 		for _, route := range routeMap {
-			// 미들웨어 있는 경우 처리
-			if route.Middleware != nil {
-				m.Server.Handle(route.Path, route.Middleware(route.HandlerFunc)).Methods(route.Method)
-			} else {
-				m.Server.HandleFunc(route.Path, route.HandlerFunc).Methods(route.Method)
+
+			handler := route.HandlerFunc
+
+			// 미드웨어가 있는 경우
+			for i := len(route.Middleware) - 1; i >= 0; i-- {
+				handler = route.Middleware[i](handler)
 			}
+
+			m.Server.Handle(route.Path, handler).Methods(route.Method)
 		}
 	}
 }
@@ -78,13 +83,16 @@ func (m *Router) InitSwagger() {
 	)).Methods(http.MethodGet)
 }
 
+// 5173
 func (m *Router) InitCORS() {
 	m.CorsHandle = cors.New(cors.Options{
 		AllowedOrigins: []string{
 			"http://localhost:3000",
 			"https://localhost:3000",
-			"http://kp-realworld.com",
-			"https://kp-realworld.com",
+			"http://localhost:5173",
+			"https://localhost:5173",
+			"http://*.kp-realworld.com",
+			"https://*.kp-realworld.com",
 		},
 		AllowedMethods: []string{
 			http.MethodGet,
@@ -106,20 +114,30 @@ func (m *Router) InitCORS() {
 
 }
 
-type Middleware func(http.HandlerFunc) http.Handler
+type Middleware func(handlerFunc http.HandlerFunc) http.HandlerFunc
 type Route struct {
 	Method      string
 	Path        string
 	HandlerFunc http.HandlerFunc
-	Middleware  Middleware
+	Middleware  []Middleware
 }
 
-func authMiddleware(next http.HandlerFunc) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func LoggingMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		// todo : logging
+
+		next(w, r)
+	}
+}
+
+func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 
 		token := r.Header.Get("Authorization")
 		if token == "" {
-			w.WriteHeader(401)
+			responder.ErrorResponse(w, http.StatusUnauthorized, "token is empty")
+			//w.WriteHeader(401)
 			return
 		}
 
@@ -127,17 +145,41 @@ func authMiddleware(next http.HandlerFunc) http.Handler {
 			return []byte(env.Config.Auth.Secret), nil
 		})
 		if err != nil {
-			w.WriteHeader(401)
+			responder.ErrorResponse(w, http.StatusUnauthorized, "token is invalid")
 			return
 		}
 
 		if _, ok := parsedToken.Claims.(*types.JWTClaims); ok && parsedToken.Valid {
 
 		} else {
+			responder.ErrorResponse(w, http.StatusUnauthorized, "token is invalid")
 			w.WriteHeader(401)
 			return
 		}
 
 		next(w, r)
-	})
+	}
+}
+
+func testMiddlewareA(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("a")
+
+		next(w, r)
+	}
+}
+
+func testMiddlewareB(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("b")
+		next(w, r)
+	}
+
+}
+
+func testMiddlewareC(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("c")
+		next(w, r)
+	}
 }

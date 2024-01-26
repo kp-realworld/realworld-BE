@@ -1,4 +1,4 @@
-package user
+package userdto
 
 type ReadUserProfileResponseDTO struct {
 	Username     string  `json:"username"`
@@ -14,6 +14,10 @@ type UpdateUserProfileRequestDTO struct {
 	Username     *string `json:"username"`
 	Bio          *string `json:"bio"`
 	ProfileImage *string `json:"profile_image"`
+}
+
+func (dtd *UpdateUserProfileRequestDTO) IsEmpty() bool {
+	return dtd.Username == nil && dtd.Bio == nil && dtd.ProfileImage == nil
 }
 
 type UpdateUserProfileResponseDTO struct {

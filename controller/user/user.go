@@ -3,7 +3,7 @@ package user
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
-	. "github.com/hotkimho/realworld-api/controller/dto/user"
+	"github.com/hotkimho/realworld-api/controller/dto/user"
 	"github.com/hotkimho/realworld-api/repository"
 	"github.com/hotkimho/realworld-api/responder"
 	"net/http"
@@ -18,13 +18,14 @@ import (
 // @Produce json
 // @Param user_id path int true "user_id"
 // @Param authorization header string true "jwt token"
-// @Success 200 {object} ReadUserProfileResponseWrapperDTO "success"
+// @Success 200 {object} userdto.ReadUserProfileResponseWrapperDTO "success"
 // @Failure 400 {object} types.ErrorResponse "bad request"
+// @Failure 404 {object} types.ErrorResponse "user not found"
+// @Failure 422 {object} types.ErrorResponse "요청을 제대로 수행하지 못함"
 // @Failure 500 {object} types.ErrorResponse "network error"
 // @Router /user/{user_id}/profile [get]
 func ReadUserProfile(w http.ResponseWriter, r *http.Request) {
 	// @Header authorization string true "jwt token"
-	token := r.Header.Get("authorization")
 	vars := mux.Vars(r)
 	userID, err := strconv.ParseInt(vars["user_id"], 10, 64)
 	if err != nil {
@@ -55,9 +56,10 @@ func ReadUserProfile(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param user_id path int true "user_id"
 // @Param authorization header string true "jwt token"
-// @Param updateUserProfileReq body UpdateUserProfileRequestDTO true "updateUserProfileReq"
-// @Success 200 {object} UpdateUserProfileResponseWrapperDTO "success"
+// @Param updateUserProfileReq body userdto.UpdateUserProfileRequestDTO true "updateUserProfileReq"
+// @Success 200 {object} userdto.UpdateUserProfileResponseWrapperDTO "success"
 // @Failure 400 {object} types.ErrorResponse "bad request"
+// @Failure 422 {object} types.ErrorResponse "요청을 제대로 수행하지 못함"
 // @Failure 500 {object} types.ErrorResponse "network error"
 // @Router /user/{user_id}/profile [put]
 func UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
@@ -67,11 +69,16 @@ func UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
 		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	var updateUserProfileReq UpdateUserProfileRequestDTO
+	var updateUserProfileReq userdto.UpdateUserProfileRequestDTO
 
 	err = json.NewDecoder(r.Body).Decode(&updateUserProfileReq)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if updateUserProfileReq.IsEmpty() {
+		responder.ErrorResponse(w, http.StatusBadRequest, "invalid request")
 		return
 	}
 

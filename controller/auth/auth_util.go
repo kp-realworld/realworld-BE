@@ -18,7 +18,7 @@ func CheckPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
-func SignUpDTOToUser(requestDTO auth.SignUpRequestDTO, hashedPassword string) models.User {
+func SignUpDTOToUser(requestDTO authdto.SignUpRequestDTO, hashedPassword string) models.User {
 	return models.User{
 		Username:     requestDTO.Username,
 		Email:        requestDTO.Email,
@@ -29,8 +29,8 @@ func SignUpDTOToUser(requestDTO auth.SignUpRequestDTO, hashedPassword string) mo
 
 func UserToSignInResponseDTO(user models.User, token string) (string, error) {
 
-	wrapper := auth.SignInResponseWrapperDTO{
-		User: auth.SignInResponseDTO{
+	wrapper := authdto.SignInResponseWrapperDTO{
+		User: authdto.SignInResponseDTO{
 			UserID:   user.UserID,
 			Username: user.Username,
 			Token:    token,
