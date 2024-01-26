@@ -44,19 +44,31 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.SignInRequestDTO"
+                            "$ref": "#/definitions/authdto.SignInRequestDTO"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "success",
+                        "description": "로그인 성공",
                         "schema": {
-                            "$ref": "#/definitions/auth.SignInResponseWrapperDTO"
+                            "$ref": "#/definitions/authdto.SignInResponseWrapperDTO"
                         }
                     },
                     "400": {
-                        "description": "bad request",
+                        "description": "입력값이 유효하지 않음",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "유저가 존재하지 않거나 비밀번호가 틀림",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "network error",
                         "schema": {
                             "$ref": "#/definitions/types.ErrorResponse"
                         }
@@ -84,7 +96,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/auth.SignUpRequestDTO"
+                            "$ref": "#/definitions/authdto.SignUpRequestDTO"
                         }
                     }
                 ],
@@ -92,11 +104,17 @@ const docTemplate = `{
                     "201": {
                         "description": "success",
                         "schema": {
-                            "$ref": "#/definitions/auth.SignUpResponseWrapperDTO"
+                            "$ref": "#/definitions/authdto.SignUpResponseWrapperDTO"
                         }
                     },
                     "400": {
-                        "description": "bad request",
+                        "description": "입력값이 유효하지 않음",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "이미 존재하는 계정",
                         "schema": {
                             "$ref": "#/definitions/types.ErrorResponse"
                         }
@@ -137,11 +155,23 @@ const docTemplate = `{
                     "200": {
                         "description": "success",
                         "schema": {
-                            "$ref": "#/definitions/user.ReadUserProfileResponseWrapperDTO"
+                            "$ref": "#/definitions/userdto.ReadUserProfileResponseWrapperDTO"
                         }
                     },
                     "400": {
                         "description": "bad request",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "user not found",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "요청을 제대로 수행하지 못함",
                         "schema": {
                             "$ref": "#/definitions/types.ErrorResponse"
                         }
@@ -187,7 +217,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/user.UpdateUserProfileRequestDTO"
+                            "$ref": "#/definitions/userdto.UpdateUserProfileRequestDTO"
                         }
                     }
                 ],
@@ -195,11 +225,17 @@ const docTemplate = `{
                     "200": {
                         "description": "success",
                         "schema": {
-                            "$ref": "#/definitions/user.UpdateUserProfileResponseWrapperDTO"
+                            "$ref": "#/definitions/userdto.UpdateUserProfileResponseWrapperDTO"
                         }
                     },
                     "400": {
                         "description": "bad request",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "요청을 제대로 수행하지 못함",
                         "schema": {
                             "$ref": "#/definitions/types.ErrorResponse"
                         }
@@ -215,7 +251,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "auth.SignInRequestDTO": {
+        "authdto.SignInRequestDTO": {
             "type": "object",
             "required": [
                 "email",
@@ -230,7 +266,7 @@ const docTemplate = `{
                 }
             }
         },
-        "auth.SignInResponseDTO": {
+        "authdto.SignInResponseDTO": {
             "type": "object",
             "properties": {
                 "token": {
@@ -244,15 +280,15 @@ const docTemplate = `{
                 }
             }
         },
-        "auth.SignInResponseWrapperDTO": {
+        "authdto.SignInResponseWrapperDTO": {
             "type": "object",
             "properties": {
                 "user": {
-                    "$ref": "#/definitions/auth.SignInResponseDTO"
+                    "$ref": "#/definitions/authdto.SignInResponseDTO"
                 }
             }
         },
-        "auth.SignUpRequestDTO": {
+        "authdto.SignUpRequestDTO": {
             "type": "object",
             "required": [
                 "email",
@@ -271,7 +307,7 @@ const docTemplate = `{
                 }
             }
         },
-        "auth.SignUpResponseDTO": {
+        "authdto.SignUpResponseDTO": {
             "type": "object",
             "properties": {
                 "email": {
@@ -285,11 +321,11 @@ const docTemplate = `{
                 }
             }
         },
-        "auth.SignUpResponseWrapperDTO": {
+        "authdto.SignUpResponseWrapperDTO": {
             "type": "object",
             "properties": {
                 "user": {
-                    "$ref": "#/definitions/auth.SignUpResponseDTO"
+                    "$ref": "#/definitions/authdto.SignUpResponseDTO"
                 }
             }
         },
@@ -312,7 +348,7 @@ const docTemplate = `{
                 }
             }
         },
-        "user.ReadUserProfileResponseDTO": {
+        "userdto.ReadUserProfileResponseDTO": {
             "type": "object",
             "properties": {
                 "bio": {
@@ -326,15 +362,15 @@ const docTemplate = `{
                 }
             }
         },
-        "user.ReadUserProfileResponseWrapperDTO": {
+        "userdto.ReadUserProfileResponseWrapperDTO": {
             "type": "object",
             "properties": {
                 "user": {
-                    "$ref": "#/definitions/user.ReadUserProfileResponseDTO"
+                    "$ref": "#/definitions/userdto.ReadUserProfileResponseDTO"
                 }
             }
         },
-        "user.UpdateUserProfileRequestDTO": {
+        "userdto.UpdateUserProfileRequestDTO": {
             "type": "object",
             "properties": {
                 "bio": {
@@ -348,7 +384,7 @@ const docTemplate = `{
                 }
             }
         },
-        "user.UpdateUserProfileResponseDTO": {
+        "userdto.UpdateUserProfileResponseDTO": {
             "type": "object",
             "properties": {
                 "bio": {
@@ -362,11 +398,11 @@ const docTemplate = `{
                 }
             }
         },
-        "user.UpdateUserProfileResponseWrapperDTO": {
+        "userdto.UpdateUserProfileResponseWrapperDTO": {
             "type": "object",
             "properties": {
                 "user": {
-                    "$ref": "#/definitions/user.UpdateUserProfileResponseDTO"
+                    "$ref": "#/definitions/userdto.UpdateUserProfileResponseDTO"
                 }
             }
         }

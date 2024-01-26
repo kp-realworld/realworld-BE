@@ -2,15 +2,15 @@ package responder
 
 import (
 	"encoding/json"
-	"github.com/hotkimho/realworld-api/controller/dto/auth"
+	authdto "github.com/hotkimho/realworld-api/controller/dto/auth"
 	"github.com/hotkimho/realworld-api/models"
 	"net/http"
 )
 
 func SignInResponse(w http.ResponseWriter, user models.User, token string) {
 
-	wrapper := auth.SignInResponseWrapperDTO{
-		User: auth.SignInResponseDTO{
+	wrapper := authdto.SignInResponseWrapperDTO{
+		User: authdto.SignInResponseDTO{
 			UserID:   user.UserID,
 			Username: user.Username,
 			Token:    token,
@@ -28,10 +28,10 @@ func SignInResponse(w http.ResponseWriter, user models.User, token string) {
 	w.Write(jsonData)
 }
 
-func SignUpResponse(w http.ResponseWriter, requestDTO auth.SignUpRequestDTO, userID int64) {
+func SignUpResponse(w http.ResponseWriter, requestDTO authdto.SignUpRequestDTO, userID int64) {
 
-	wrapper := auth.SignUpResponseWrapperDTO{
-		User: auth.SignUpResponseDTO{
+	wrapper := authdto.SignUpResponseWrapperDTO{
+		User: authdto.SignUpResponseDTO{
 			Username: requestDTO.Username,
 			Email:    requestDTO.Email,
 			UserID:   userID,
@@ -45,6 +45,6 @@ func SignUpResponse(w http.ResponseWriter, requestDTO auth.SignUpRequestDTO, use
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 	w.Write(jsonData)
 }

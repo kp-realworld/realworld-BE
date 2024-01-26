@@ -2,7 +2,7 @@ package auth
 
 import (
 	"encoding/json"
-	. "github.com/hotkimho/realworld-api/controller/dto/auth"
+	authdto "github.com/hotkimho/realworld-api/controller/dto/auth"
 	"github.com/hotkimho/realworld-api/repository"
 	"github.com/hotkimho/realworld-api/responder"
 	"github.com/hotkimho/realworld-api/util"
@@ -14,13 +14,14 @@ import (
 // @Tags Auth tag
 // @Accept json
 // @Produce json
-// @Param signUpReq body SignUpRequestDTO true "signUpReq"
-// @Success 201 {object} SignUpResponseWrapperDTO "success"
-// @Failure 400 {object} types.ErrorResponse "bad request"
+// @Param signUpReq body authdto.SignUpRequestDTO true "signUpReq"
+// @Success 201 {object} authdto.SignUpResponseWrapperDTO "success"
+// @Failure 400 {object} types.ErrorResponse "입력값이 유효하지 않음"
+// @Failure 422 {object} types.ErrorResponse "이미 존재하는 계정"
 // @Router /user/signup [post]
 func SignUp(w http.ResponseWriter, r *http.Request) {
 
-	var signUpReq SignUpRequestDTO
+	var signUpReq authdto.SignUpRequestDTO
 
 	err := json.NewDecoder(r.Body).Decode(&signUpReq)
 	if err != nil {
@@ -33,19 +34,24 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if !repository.UserRepo.CheckEmailOrUsername(repository.DB, signUpReq.Email, signUpReq.Username) {
+		responder.ErrorResponse(w, http.StatusUnprocessableEntity, "already username or email")
+		return
+	}
+
 	hashedPassword, err := HashPassword(signUpReq.Password)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	userID, err := repository.UserRepo.Create(repository.DB, SignUpDTOToUser(signUpReq, hashedPassword))
+	createdUser, err := repository.UserRepo.Create(repository.DB, SignUpDTOToUser(signUpReq, hashedPassword))
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	responder.SignUpResponse(w, signUpReq, userID)
+	responder.SignUpResponse(w, signUpReq, createdUser.UserID)
 }
 
 // @Summary 로그인
@@ -53,13 +59,15 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 // @Tags Auth tag
 // @Accept json
 // @Produce json
-// @Param signInReq body SignInRequestDTO true "signInReq"
-// @Success 200 {object} SignInResponseWrapperDTO "success"
-// @Failure 400 {object} types.ErrorResponse "bad request"
+// @Param signInReq body authdto.SignInRequestDTO true "signInReq"
+// @Success 200 {object} authdto.SignInResponseWrapperDTO "로그인 성공"
+// @Failure 400 {object} types.ErrorResponse "입력값이 유효하지 않음"
+// @Failure 422 {object} types.ErrorResponse "유저가 존재하지 않거나 비밀번호가 틀림"
+// @Failure 500 {object} types.ErrorResponse "network error"
 // @Router /user/signin [post]
 func SignIn(w http.ResponseWriter, r *http.Request) {
 
-	var SignInReq SignInRequestDTO
+	var SignInReq authdto.SignInRequestDTO
 
 	err := json.NewDecoder(r.Body).Decode(&SignInReq)
 	if err != nil {
@@ -77,12 +85,12 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	} else if user == nil {
-		responder.ErrorResponse(w, http.StatusBadRequest, "user not found")
+		responder.ErrorResponse(w, http.StatusUnprocessableEntity, "user not found")
 		return
 	}
 
 	if !CheckPasswordHash(SignInReq.Password, user.Password) {
-		responder.ErrorResponse(w, http.StatusBadRequest, "password incorrect")
+		responder.ErrorResponse(w, http.StatusUnprocessableEntity, "password incorrect")
 		return
 	}
 

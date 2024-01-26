@@ -1,4 +1,4 @@
-package auth
+package authdto
 
 type SignUpRequestDTO struct {
 	Username string `json:"username" validate:"required"`

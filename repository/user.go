@@ -14,14 +14,14 @@ func NewUserRepository() *userRepository {
 	return &userRepository{}
 }
 
-func (repo *userRepository) Create(db *gorm.DB, user models.User) (int64, error) {
+func (repo *userRepository) Create(db *gorm.DB, user models.User) (*models.User, error) {
 
-	err := db.Create(&user)
-	if err.Error != nil {
-		return 0, err.Error
+	err := db.Create(&user).Error
+	if err != nil {
+		return nil, err
 	}
 
-	return user.UserID, nil
+	return &user, nil
 }
 
 func (repo *userRepository) GetByEmail(db *gorm.DB, email string) (*models.User, error) {
@@ -58,7 +58,7 @@ func (repo *userRepository) GetByID(db *gorm.DB, id int64) (*models.User, error)
 	return &user, nil
 }
 
-func (repo *userRepository) UpdateUserProfileByID(db *gorm.DB, updateRequest user.UpdateUserProfileRequestDTO, id int64) (*models.User, error) {
+func (repo *userRepository) UpdateUserProfileByID(db *gorm.DB, updateRequest userdto.UpdateUserProfileRequestDTO, id int64) (*models.User, error) {
 
 	var user models.User
 
@@ -80,4 +80,16 @@ func (repo *userRepository) UpdateUserProfileByID(db *gorm.DB, updateRequest use
 	}
 
 	return &user, nil
+}
+
+func (repo *userRepository) CheckEmailOrUsername(db *gorm.DB, email, username string) bool {
+
+	var user models.User
+
+	err := db.Where(models.User{Email: email}).Or(models.User{Username: username}).First(&user).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return true
+	}
+
+	return false
 }
