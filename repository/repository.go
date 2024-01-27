@@ -9,7 +9,9 @@ import (
 )
 
 var DB *gorm.DB
+
 var UserRepo *userRepository
+var ArticleRepo *articleRepository
 
 func Init() error {
 
@@ -34,7 +36,7 @@ func Init() error {
 	// Init Repositories
 	initRepositories()
 
-	err = DB.AutoMigrate(models.User{})
+	err = DB.AutoMigrate(models.User{}, models.Article{})
 	if err != nil {
 		return err
 	}
@@ -48,4 +50,5 @@ func makeDSN(user, password, host, name string, port int) string {
 
 func initRepositories() {
 	UserRepo = NewUserRepository()
+	ArticleRepo = NewArticleRepository()
 }
