@@ -1,11 +1,12 @@
-package article
+package articledto
 
 import "time"
 
 type CreateArticleRequestDTO struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Body        string `json:"body"`
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	Body        string   `json:"body"`
+	TagList     []string `json:"tag_list"`
 }
 
 type ArticleAuthor struct {
@@ -19,6 +20,8 @@ type CreateArticleResponseDTO struct {
 	Description   string        `json:"description"`
 	Body          string        `json:"body"`
 	FavoriteCount int           `json:"favorite_count"`
+	TagList       []string      `json:"tag_list"`
+	IsFavorited   bool          `json:"is_favorited"`
 	Author        ArticleAuthor `json:"author"`
 	CreatedAt     time.Time     `json:"created_at"`
 }
@@ -32,6 +35,8 @@ type ReadArticleResponseDTO struct {
 	Description   string        `json:"description"`
 	Body          string        `json:"body"`
 	FavoriteCount int           `json:"favorite_count"`
+	TagList       []string      `json:"tag_list"`
+	IsFavorited   bool          `json:"is_favorited"`
 	Author        ArticleAuthor `json:"author"`
 	CreatedAt     time.Time     `json:"created_at"`
 }
@@ -42,4 +47,26 @@ type ReadArticleResponseWrapperDTO struct {
 
 type ReadArticleListResponseDTO struct {
 	Articles []ReadArticleResponseDTO `json:"articles"`
+}
+
+type UpdateArticleRequestDTO struct {
+	Title       *string  `json:"title"`
+	Description *string  `json:"description"`
+	Body        *string  `json:"body"`
+	TagList     []string `json:"tag_list"`
+}
+
+type UpdateArticleResponseDTO struct {
+	Title         string        `json:"title"`
+	Description   string        `json:"description"`
+	Body          string        `json:"body"`
+	FavoriteCount int           `json:"favorite_count"`
+	TagList       []string      `json:"tag_list"`
+	IsFavorited   bool          `json:"is_favorited"`
+	Author        ArticleAuthor `json:"author"`
+	CreatedAt     time.Time     `json:"created_at"`
+}
+
+type UpdateArticleResponseWrapperDTO struct {
+	Article UpdateArticleResponseDTO `json:"article"`
 }

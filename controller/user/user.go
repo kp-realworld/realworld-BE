@@ -2,12 +2,14 @@ package user
 
 import (
 	"encoding/json"
+	"net/http"
+	"strconv"
+
 	"github.com/gorilla/mux"
+
 	"github.com/hotkimho/realworld-api/controller/dto/user"
 	"github.com/hotkimho/realworld-api/repository"
 	"github.com/hotkimho/realworld-api/responder"
-	"net/http"
-	"strconv"
 )
 
 // header에 authorization이 있어야 한다.
@@ -64,6 +66,7 @@ func ReadUserProfile(w http.ResponseWriter, r *http.Request) {
 // @Router /user/{user_id}/profile [put]
 func UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+
 	userID, err := strconv.ParseInt(vars["user_id"], 10, 64)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())

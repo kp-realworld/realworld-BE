@@ -1,6 +1,13 @@
 package repository
 
-import "gorm.io/gorm"
+import (
+	"errors"
+
+	"gorm.io/gorm"
+
+	articledto "github.com/hotkimho/realworld-api/controller/dto/article"
+	"github.com/hotkimho/realworld-api/models"
+)
 
 type articleRepository struct{}
 
@@ -8,6 +15,106 @@ func NewArticleRepository() *articleRepository {
 	return &articleRepository{}
 }
 
-func (repo *articleRepository) Create(db *gorm.DB) {
+func (repo *articleRepository) Create(db *gorm.DB, requestDTO articledto.CreateArticleRequestDTO, userID int64) (*models.Article, error) {
 
+	article := models.Article{
+		Title:       requestDTO.Title,
+		Description: requestDTO.Description,
+		Body:        requestDTO.Body,
+		UserID:      userID,
+	}
+
+	err := db.Create(&article).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &article, nil
+}
+
+// 트랜잭션을 써서 article을 생성하고 article_tag를 생성하는 함수
+func (repo *articleRepository) CreateWithTransaction(db *gorm.DB, requestDTO articledto.CreateArticleRequestDTO, userID int64) (*models.Article, error) {
+
+	tx := db.Begin()
+
+	article, err := repo.Create(tx, requestDTO, userID)
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	_, err = NewArticleTagRepository().Create(tx, article.ID, requestDTO.TagList)
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	err = tx.Commit().Error
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	return article, nil
+}
+
+func (repo *articleRepository) GetByID(db *gorm.DB, articleID, userID int64) (*models.Article, error) {
+
+	var article models.Article
+
+	err := db.Where(&models.Article{
+		ID:     articleID,
+		UserID: userID,
+	}).First(&article).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	return &article, nil
+}
+
+func (repo *articleRepository) UpdateByID(db *gorm.DB, requestDTO articledto.UpdateArticleRequestDTO, articleID, userID int64) (*models.Article, error) {
+
+	var article models.Article
+
+	updateData := map[string]interface{}{}
+
+	if requestDTO.Title != nil {
+		updateData["title"] = *requestDTO.Title
+	}
+
+	if requestDTO.Description != nil {
+		updateData["description"] = *requestDTO.Description
+	}
+
+	if requestDTO.Body != nil {
+		updateData["body"] = *requestDTO.Body
+	}
+
+	err := db.Model(&article).Where(&models.Article{
+		ID:     articleID,
+		UserID: userID,
+	}).Updates(updateData).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &article, nil
+}
+
+func (repo *articleRepository) DeleteByID(db *gorm.DB, articleID, userID int64) error {
+
+	err := db.Where(&models.Article{
+		ID:     articleID,
+		UserID: userID,
+	}).Delete(&models.Article{}).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
