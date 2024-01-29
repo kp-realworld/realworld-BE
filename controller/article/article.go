@@ -21,7 +21,7 @@ import (
 // @Failure 400 {object} types.ErrorResponse "bad request"
 // @Failure 422 {object} types.ErrorResponse "요청을 제대로 수행하지 못함"
 // @Failure 500 {object} types.ErrorResponse "network error"
-// @Router /user/article [post]
+// @Router /user/{user_id}/article [post]
 func CreateArticle(w http.ResponseWriter, r *http.Request) {
 
 	userID, err := util.GetIntegerParam[int64](r, "user_id")
@@ -55,15 +55,33 @@ func CreateArticle(w http.ResponseWriter, r *http.Request) {
 	responder.CreateArticleResponse(w, createArticleReq)
 }
 
+// @Summary Read article by id
+// @Description Read article by id
+// @Tags Article tag
+// @Accept json
+// @Produce json
+// @Param authorization header string true "jwt token"
+// @Param user_id path int true "user id"
+// @Param article_id path int true "article id"
+// @Success 200 {object} articledto.ReadArticleResponseWrapperDTO "success"
+// @Failure 400 {object} types.ErrorResponse "bad request"
+// @Failure 404 {object} types.ErrorResponse "article not found"
+// @Failure 422 {object} types.ErrorResponse "요청을 제대로 수행하지 못함"
+// @Failure 500 {object} types.ErrorResponse "network error"
 func ReadArticleByID(w http.ResponseWriter, r *http.Request) {
 
+	userID, err := util.GetIntegerParam[int64](r, "user_id")
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
+		return
+	}
 	articleID, err := util.GetIntegerParam[int64](r, "article_id")
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	article, err := repository.ArticleRepo.GetByID(repository.DB, articleID)
+	article, err := repository.ArticleRepo.GetByID(repository.DB, articleID, userID)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
@@ -72,5 +90,5 @@ func ReadArticleByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responder.ReadArticleResponse(w, *article)
+	responder.ReadArticleByIDResponse(w, *article)
 }

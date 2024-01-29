@@ -6,7 +6,7 @@ type CreateArticleRequestDTO struct {
 	Title       string   `json:"title"`
 	Description string   `json:"description"`
 	Body        string   `json:"body"`
-	TagList     []string `json:"tag_list"`
+	TagList     []string `json:"tag_list",omitempty`
 }
 
 type ArticleAuthor struct {

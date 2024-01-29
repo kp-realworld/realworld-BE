@@ -24,7 +24,7 @@ func (repo *articleRepository) Create(db *gorm.DB, requestDTO articledto.CreateA
 		UserID:      userID,
 	}
 
-	err := db.Create(&article).Error
+	err := db.Preload("User").Create(&article).Error
 	if err != nil {
 		return nil, err
 	}
@@ -43,10 +43,12 @@ func (repo *articleRepository) CreateWithTransaction(db *gorm.DB, requestDTO art
 		return nil, err
 	}
 
-	_, err = NewArticleTagRepository().Create(tx, article.ID, requestDTO.TagList)
-	if err != nil {
-		tx.Rollback()
-		return nil, err
+	if len(requestDTO.TagList) > 0 {
+		_, err = NewArticleTagRepository().Create(tx, article.ID, requestDTO.TagList)
+		if err != nil {
+			tx.Rollback()
+			return nil, err
+		}
 	}
 
 	err = tx.Commit().Error
@@ -62,10 +64,13 @@ func (repo *articleRepository) GetByID(db *gorm.DB, articleID, userID int64) (*m
 
 	var article models.Article
 
-	err := db.Where(&models.Article{
-		ID:     articleID,
-		UserID: userID,
-	}).First(&article).Error
+	err := db.Preload("User").
+		Preload("LikeBy", "user_id = ?", userID).
+		Preload("TagList").
+		First(&article, &models.Article{
+			ID:     articleID,
+			UserID: userID,
+		}).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil

@@ -15,6 +15,7 @@ var DB *gorm.DB
 var UserRepo *userRepository
 var ArticleRepo *articleRepository
 var ArticleTagRepo *articleTagRepository
+var ArticleLikeRepo *articleLikeRepository
 
 func Init() error {
 
@@ -38,7 +39,7 @@ func Init() error {
 
 	// Init Repositories
 	initRepositories()
-
+	// models.Article{}, models.ArticleTag{}, models.ArticleLike{}
 	err = DB.AutoMigrate(models.User{}, models.Article{}, models.ArticleTag{}, models.ArticleLike{})
 	if err != nil {
 		return err
@@ -55,4 +56,5 @@ func initRepositories() {
 	UserRepo = NewUserRepository()
 	ArticleRepo = NewArticleRepository()
 	ArticleTagRepo = NewArticleTagRepository()
+	ArticleLikeRepo = NewArticleLikeRepository()
 }

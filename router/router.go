@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
+	"github.com/hotkimho/realworld-api/controller/article"
 	"github.com/hotkimho/realworld-api/controller/auth"
 	"github.com/hotkimho/realworld-api/controller/user"
 	"github.com/hotkimho/realworld-api/env"
@@ -24,7 +25,7 @@ func (m *Router) Init() {
 
 	m.InitSwagger()
 	m.InitCORS()
-
+	m.AddRoute(ArticleRouter)
 	m.AddRoute([][]*Route{
 		{
 			{
@@ -56,6 +57,17 @@ func (m *Router) Init() {
 			},
 		},
 	})
+}
+
+var ArticleRouter = [][]*Route{
+	{
+
+		{
+			Method:      "POST",
+			Path:        "/user/{user_id}/article",
+			HandlerFunc: article.CreateArticle,
+		},
+	},
 }
 
 func (m *Router) AddRoute(routeMaps [][]*Route) {
