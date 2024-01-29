@@ -11,7 +11,7 @@ type CreateArticleRequestDTO struct {
 
 type ArticleAuthor struct {
 	Username     string  `json:"username"`
-	Bio          *string `json:"bio"`
+	Bio          *string `json:"bio",omitempty`
 	ProfileImage string  `json:"profile_image"`
 }
 
@@ -20,7 +20,7 @@ type CreateArticleResponseDTO struct {
 	Description   string        `json:"description"`
 	Body          string        `json:"body"`
 	FavoriteCount int           `json:"favorite_count"`
-	TagList       []string      `json:"tag_list"`
+	TagList       []string      `json:"tag_list",omitempty`
 	IsFavorited   bool          `json:"is_favorited"`
 	Author        ArticleAuthor `json:"author"`
 	CreatedAt     time.Time     `json:"created_at"`

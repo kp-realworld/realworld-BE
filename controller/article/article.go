@@ -43,7 +43,7 @@ func CreateArticle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = repository.ArticleRepo.CreateWithTransaction(
+	article, err := repository.ArticleRepo.CreateWithTransaction(
 		repository.DB,
 		createArticleReq,
 		userID)
@@ -52,7 +52,7 @@ func CreateArticle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responder.CreateArticleResponse(w, createArticleReq)
+	responder.CreateArticleResponse(w, *article, createArticleReq.TagList)
 }
 
 // @Summary Read article by id

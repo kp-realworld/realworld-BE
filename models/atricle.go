@@ -11,16 +11,16 @@ type Article struct {
 	Body          string `gorm:"type:varchar(128); not null" json:"body"`
 	FavoriteCount int    `gorm:"type:int(11); not null; default:0" json:"favorite_count"`
 	User          User
-	TagList       []ArticleTag `gorm:"many2many:article_tags;"`
-	LikeBy        []User       `gorm:"many2many:article_likes;"`
-	CreatedAt     time.Time    `gorm:"type:datetime; not null; default:CURRENT_TIMESTAMP" json:"created_at"`
-	UpdatedAt     *time.Time   `gorm:"type:datetime; null; default:null" json:"updated_at"`
-	DeletedAt     *time.Time   `gorm:"type:datetime; null; default:null" json:"deleted_at"`
+	TagList       []ArticleTag  `gorm:"many2many:article_article_tags;"`
+	LikeBy        []ArticleLike `gorm:"many2many:article_likes;"`
+	CreatedAt     time.Time     `gorm:"type:datetime; not null; default:CURRENT_TIMESTAMP" json:"created_at"`
+	UpdatedAt     *time.Time    `gorm:"type:datetime; null; default:null" json:"updated_at"`
+	DeletedAt     *time.Time    `gorm:"type:datetime; null; default:null" json:"deleted_at"`
 }
 
 type ArticleLike struct {
-	UserID    uint       `gorm:"primaryKey"`
-	ArticleID uint       `gorm:"primaryKey"`
+	UserID    int64      `gorm:"primaryKey"`
+	ArticleID int64      `gorm:"primaryKey"`
 	CreatedAt time.Time  `gorm:"type:datetime; not null; default:CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt *time.Time `gorm:"type:datetime; null; default:null" json:"updated_at"`
 	DeletedAt *time.Time `gorm:"type:datetime; null; default:null" json:"deleted_at"`

@@ -2,19 +2,30 @@ package responder
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/hotkimho/realworld-api/models"
 	"net/http"
 
 	articledto "github.com/hotkimho/realworld-api/controller/dto/article"
 )
 
-func CreateArticleResponse(w http.ResponseWriter, requestDTO articledto.CreateArticleRequestDTO) {
+func CreateArticleResponse(w http.ResponseWriter, article models.Article, tagList []string) {
+
+	fmt.Println("article : ", article)
 	wrapper := articledto.CreateArticleResponseWrapperDTO{
 		Article: articledto.CreateArticleResponseDTO{
-			Title:       requestDTO.Title,
-			Description: requestDTO.Description,
-			Body:        requestDTO.Body,
-			TagList:     requestDTO.TagList,
+			Title:         article.Title,
+			Description:   article.Description,
+			Body:          article.Body,
+			TagList:       tagList,
+			IsFavorited:   false,
+			FavoriteCount: article.FavoriteCount,
+			Author: articledto.ArticleAuthor{
+				Username:     article.User.Username,
+				Bio:          article.User.Bio,
+				ProfileImage: article.User.ProfileImage,
+			},
+			CreatedAt: article.CreatedAt,
 		},
 	}
 

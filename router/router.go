@@ -61,11 +61,15 @@ func (m *Router) Init() {
 
 var ArticleRouter = [][]*Route{
 	{
-
 		{
 			Method:      "POST",
 			Path:        "/user/{user_id}/article",
 			HandlerFunc: article.CreateArticle,
+		},
+		{
+			Method:      "GET",
+			Path:        "/user/{user_id}/article/{article_id}",
+			HandlerFunc: article.ReadArticleByID,
 		},
 	},
 }

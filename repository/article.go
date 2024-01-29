@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"fmt"
 
 	"gorm.io/gorm"
 
@@ -24,11 +25,15 @@ func (repo *articleRepository) Create(db *gorm.DB, requestDTO articledto.CreateA
 		UserID:      userID,
 	}
 
-	err := db.Preload("User").Create(&article).Error
+	err := db.Preload("User", "user_id = ?", userID).Create(&article).Error
 	if err != nil {
 		return nil, err
 	}
 
+	err = db.Model(article).Association("User").Find(&article.User)
+	if err != nil {
+		return nil, err
+	}
 	return &article, nil
 }
 
@@ -62,9 +67,11 @@ func (repo *articleRepository) CreateWithTransaction(db *gorm.DB, requestDTO art
 
 func (repo *articleRepository) GetByID(db *gorm.DB, articleID, userID int64) (*models.Article, error) {
 
+	db.Debug()
 	var article models.Article
 
-	err := db.Preload("User").
+	err := db.Debug().Model(article).
+		Preload("User").
 		Preload("LikeBy", "user_id = ?", userID).
 		Preload("TagList").
 		First(&article, &models.Article{
@@ -78,7 +85,13 @@ func (repo *articleRepository) GetByID(db *gorm.DB, articleID, userID int64) (*m
 
 		return nil, err
 	}
-
+	err = db.Model(article).Association("TagList").Find(&article)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("article like: ", article.LikeBy)
+	fmt.Println("article tag: ", article.TagList)
+	fmt.Println("user : ", article.User)
 	return &article, nil
 }
 
