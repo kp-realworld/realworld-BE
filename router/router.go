@@ -2,17 +2,19 @@ package router
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
+	httpSwagger "github.com/swaggo/http-swagger"
+
 	"github.com/hotkimho/realworld-api/controller/article"
 	"github.com/hotkimho/realworld-api/controller/auth"
 	"github.com/hotkimho/realworld-api/controller/user"
 	"github.com/hotkimho/realworld-api/env"
 	"github.com/hotkimho/realworld-api/responder"
 	"github.com/hotkimho/realworld-api/types"
-	"github.com/rs/cors"
-	httpSwagger "github.com/swaggo/http-swagger"
-	"net/http"
 )
 
 type Router struct {
@@ -70,6 +72,16 @@ var ArticleRouter = [][]*Route{
 			Method:      "GET",
 			Path:        "/user/{user_id}/article/{article_id}",
 			HandlerFunc: article.ReadArticleByID,
+		},
+		{
+			Method:      "PUT",
+			Path:        "/user/{user_id}/article/{article_id}",
+			HandlerFunc: article.UpdateArticle,
+		},
+		{
+			Method:      "DELETE",
+			Path:        "/user/{user_id}/article/{article_id}",
+			HandlerFunc: article.DeleteArticle,
 		},
 	},
 }

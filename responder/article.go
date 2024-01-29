@@ -3,8 +3,9 @@ package responder
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hotkimho/realworld-api/models"
 	"net/http"
+
+	"github.com/hotkimho/realworld-api/models"
 
 	articledto "github.com/hotkimho/realworld-api/controller/dto/article"
 )
@@ -43,14 +44,15 @@ func CreateArticleResponse(w http.ResponseWriter, article models.Article, tagLis
 func ReadArticleByIDResponse(w http.ResponseWriter, article models.Article) {
 
 	isLiked := false
-	if len(article.LikeBy) > 0 {
+	if len(article.Likes) > 0 {
 		isLiked = true
 	}
 
 	tagList := make([]string, 0)
-	for _, tag := range article.TagList {
+	for _, tag := range article.Tags {
 		tagList = append(tagList, tag.Tag)
 	}
+
 	wrapper := articledto.ReadArticleResponseWrapperDTO{
 		Article: articledto.ReadArticleResponseDTO{
 			Title:         article.Title,
@@ -64,6 +66,31 @@ func ReadArticleByIDResponse(w http.ResponseWriter, article models.Article) {
 				Bio:          article.User.Bio,
 				ProfileImage: article.User.ProfileImage,
 			},
+		},
+	}
+
+	jsonData, err := json.Marshal(wrapper)
+	if err != nil {
+		ErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonData)
+}
+
+func UpdateArticleResponse(w http.ResponseWriter, article models.Article, tagList []string) {
+
+	fmt.Println("article : ", article)
+	wrapper := articledto.UpdateArticleResponseWrapperDTO{
+		Article: articledto.UpdateArticleResponseDTO{
+			Title:         article.Title,
+			Description:   article.Description,
+			Body:          article.Body,
+			TagList:       tagList,
+			FavoriteCount: article.FavoriteCount,
+			UpdatedAt:     article.UpdatedAt,
 		},
 	}
 

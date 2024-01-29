@@ -72,8 +72,8 @@ func (repo *articleRepository) GetByID(db *gorm.DB, articleID, userID int64) (*m
 
 	err := db.Debug().Model(article).
 		Preload("User").
-		Preload("LikeBy", "user_id = ?", userID).
-		Preload("TagList").
+		Preload("Likes").
+		Preload("Tags").
 		First(&article, &models.Article{
 			ID:     articleID,
 			UserID: userID,
@@ -82,16 +82,10 @@ func (repo *articleRepository) GetByID(db *gorm.DB, articleID, userID int64) (*m
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
+		fmt.Println("??")
+		return nil, err
+	}
 
-		return nil, err
-	}
-	err = db.Model(article).Association("TagList").Find(&article)
-	if err != nil {
-		return nil, err
-	}
-	fmt.Println("article like: ", article.LikeBy)
-	fmt.Println("article tag: ", article.TagList)
-	fmt.Println("user : ", article.User)
 	return &article, nil
 }
 
@@ -116,7 +110,7 @@ func (repo *articleRepository) UpdateByID(db *gorm.DB, requestDTO articledto.Upd
 	err := db.Model(&article).Where(&models.Article{
 		ID:     articleID,
 		UserID: userID,
-	}).Updates(updateData).Error
+	}).Updates(updateData).First(&article).Error
 	if err != nil {
 		return nil, err
 	}
@@ -135,4 +129,29 @@ func (repo *articleRepository) DeleteByID(db *gorm.DB, articleID, userID int64) 
 	}
 
 	return nil
+}
+
+func (repo *articleRepository) UpdateWithTransaction(db *gorm.DB, requestDTO articledto.UpdateArticleRequestDTO, userID, articleID int64) (*models.Article, error) {
+
+	tx := db.Begin()
+
+	article, err := repo.UpdateByID(tx, requestDTO, articleID, userID)
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	err = NewArticleTagRepository().Update(tx, articleID, requestDTO.TagList)
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	err = tx.Commit().Error
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	return article, nil
 }
