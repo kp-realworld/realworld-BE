@@ -23,7 +23,6 @@ import (
 // @Success 200 {object} userdto.ReadUserProfileResponseWrapperDTO "success"
 // @Failure 400 {object} types.ErrorResponse "bad request"
 // @Failure 404 {object} types.ErrorResponse "user not found"
-// @Failure 422 {object} types.ErrorResponse "요청을 제대로 수행하지 못함"
 // @Failure 500 {object} types.ErrorResponse "network error"
 // @Router /user/{user_id}/profile [get]
 func ReadUserProfile(w http.ResponseWriter, r *http.Request) {

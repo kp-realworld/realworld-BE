@@ -2,6 +2,8 @@ basePath: /v2
 definitions:
   articledto.ArticleAuthor:
     properties:
+      author_id:
+        type: integer
       bio:
         type: string
       profile_image:
@@ -24,6 +26,8 @@ definitions:
     type: object
   articledto.CreateArticleResponseDTO:
     properties:
+      article_id:
+        type: integer
       author:
         $ref: '#/definitions/articledto.ArticleAuthor'
       body:
@@ -33,8 +37,6 @@ definitions:
       description:
         type: string
       favorite_count:
-        type: integer
-      id:
         type: integer
       is_favorited:
         type: boolean
@@ -59,6 +61,8 @@ definitions:
     type: object
   articledto.ReadArticleResponseDTO:
     properties:
+      article_id:
+        type: integer
       author:
         $ref: '#/definitions/articledto.ArticleAuthor'
       body:
@@ -68,8 +72,6 @@ definitions:
       description:
         type: string
       favorite_count:
-        type: integer
-      id:
         type: integer
       is_favorited:
         type: boolean
@@ -100,6 +102,8 @@ definitions:
     type: object
   articledto.UpdateArticleResponseDTO:
     properties:
+      article_id:
+        type: integer
       body:
         type: string
       created_at:
@@ -111,8 +115,6 @@ definitions:
       description:
         type: string
       favorite_count:
-        type: integer
-      id:
         type: integer
       title:
         type: string
@@ -487,10 +489,6 @@ paths:
             $ref: '#/definitions/types.ErrorResponse'
         "404":
           description: user not found
-          schema:
-            $ref: '#/definitions/types.ErrorResponse'
-        "422":
-          description: 요청을 제대로 수행하지 못함
           schema:
             $ref: '#/definitions/types.ErrorResponse'
         "500":

@@ -73,8 +73,7 @@ func (repo *articleRepository) GetByID(db *gorm.DB, articleID, userID int64) (*m
 		Preload("Likes").
 		Preload("Tags").
 		First(&article, &models.Article{
-			ID:     articleID,
-			UserID: userID,
+			ID: articleID,
 		}).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -131,8 +130,7 @@ func (repo *articleRepository) UpdateByID(db *gorm.DB, requestDTO articledto.Upd
 	}
 
 	err := db.Model(&article).Where(&models.Article{
-		ID:     articleID,
-		UserID: userID,
+		ID: articleID,
 	}).Updates(updateData).First(&article).Error
 	if err != nil {
 		return nil, err
@@ -144,8 +142,7 @@ func (repo *articleRepository) UpdateByID(db *gorm.DB, requestDTO articledto.Upd
 func (repo *articleRepository) DeleteByID(db *gorm.DB, articleID, userID int64) error {
 
 	err := db.Where(&models.Article{
-		ID:     articleID,
-		UserID: userID,
+		ID: articleID,
 	}).Delete(&models.Article{}).Error
 	if err != nil {
 		return err

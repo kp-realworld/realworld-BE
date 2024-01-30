@@ -492,12 +492,6 @@
                             "$ref": "#/definitions/types.ErrorResponse"
                         }
                     },
-                    "422": {
-                        "description": "요청을 제대로 수행하지 못함",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    },
                     "500": {
                         "description": "network error",
                         "schema": {
@@ -576,6 +570,9 @@
         "articledto.ArticleAuthor": {
             "type": "object",
             "properties": {
+                "author_id": {
+                    "type": "integer"
+                },
                 "bio": {
                     "type": "string"
                 },
@@ -610,6 +607,9 @@
         "articledto.CreateArticleResponseDTO": {
             "type": "object",
             "properties": {
+                "article_id": {
+                    "type": "integer"
+                },
                 "author": {
                     "$ref": "#/definitions/articledto.ArticleAuthor"
                 },
@@ -623,9 +623,6 @@
                     "type": "string"
                 },
                 "favorite_count": {
-                    "type": "integer"
-                },
-                "id": {
                     "type": "integer"
                 },
                 "is_favorited": {
@@ -664,6 +661,9 @@
         "articledto.ReadArticleResponseDTO": {
             "type": "object",
             "properties": {
+                "article_id": {
+                    "type": "integer"
+                },
                 "author": {
                     "$ref": "#/definitions/articledto.ArticleAuthor"
                 },
@@ -677,9 +677,6 @@
                     "type": "string"
                 },
                 "favorite_count": {
-                    "type": "integer"
-                },
-                "id": {
                     "type": "integer"
                 },
                 "is_favorited": {
@@ -727,6 +724,9 @@
         "articledto.UpdateArticleResponseDTO": {
             "type": "object",
             "properties": {
+                "article_id": {
+                    "type": "integer"
+                },
                 "body": {
                     "type": "string"
                 },
@@ -738,9 +738,6 @@
                     "type": "string"
                 },
                 "favorite_count": {
-                    "type": "integer"
-                },
-                "id": {
                     "type": "integer"
                 },
                 "title": {

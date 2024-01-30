@@ -2,7 +2,6 @@ package responder
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/hotkimho/realworld-api/models"
@@ -12,7 +11,6 @@ import (
 
 func CreateArticleResponse(w http.ResponseWriter, article models.Article, tagList []string) {
 
-	fmt.Println("article : ", article)
 	wrapper := articledto.CreateArticleResponseWrapperDTO{
 		Article: articledto.CreateArticleResponseDTO{
 			ID:            article.ID,
@@ -67,6 +65,7 @@ func ReadArticleByIDResponse(w http.ResponseWriter, article models.Article) {
 				Username:     article.User.Username,
 				Bio:          article.User.Bio,
 				ProfileImage: article.User.ProfileImage,
+				AuthorID:     article.User.UserID,
 			},
 		},
 	}
@@ -110,6 +109,7 @@ func ReadArticleByOffsetResponse(w http.ResponseWriter, articles []models.Articl
 				Username:     article.User.Username,
 				Bio:          article.User.Bio,
 				ProfileImage: article.User.ProfileImage,
+				AuthorID:     article.User.UserID,
 			},
 		})
 	}
@@ -138,6 +138,7 @@ func UpdateArticleResponse(w http.ResponseWriter, article models.Article, tagLis
 			Description:   article.Description,
 			Body:          article.Body,
 			FavoriteCount: article.FavoriteCount,
+			CreatedAt:     article.CreatedAt,
 			UpdatedAt:     article.UpdatedAt,
 		},
 	}

@@ -10,13 +10,14 @@ type CreateArticleRequestDTO struct {
 }
 
 type ArticleAuthor struct {
+	AuthorID     int64   `json:"author_id"`
 	Username     string  `json:"username"`
 	Bio          *string `json:"bio",omitempty`
 	ProfileImage string  `json:"profile_image"`
 }
 
 type CreateArticleResponseDTO struct {
-	ID            int64         `json:"id"`
+	ID            int64         `json:"article_id"`
 	Title         string        `json:"title"`
 	Description   string        `json:"description"`
 	Body          string        `json:"body"`
@@ -32,7 +33,7 @@ type CreateArticleResponseWrapperDTO struct {
 }
 
 type ReadArticleResponseDTO struct {
-	ID            int64         `json:"id"`
+	ID            int64         `json:"article_id"`
 	Title         string        `json:"title"`
 	Description   string        `json:"description"`
 	Body          string        `json:"body"`
@@ -59,7 +60,7 @@ type UpdateArticleRequestDTO struct {
 }
 
 type UpdateArticleResponseDTO struct {
-	ID            int64  `json:"id"`
+	ID            int64  `json:"article_id"`
 	Title         string `json:"title"`
 	Description   string `json:"description"`
 	Body          string `json:"body"`
