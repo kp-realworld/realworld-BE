@@ -1,5 +1,131 @@
 basePath: /v2
 definitions:
+  articledto.ArticleAuthor:
+    properties:
+      author_id:
+        type: integer
+      bio:
+        type: string
+      profile_image:
+        type: string
+      username:
+        type: string
+    type: object
+  articledto.CreateArticleRequestDTO:
+    properties:
+      body:
+        type: string
+      description:
+        type: string
+      tag_list:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+    type: object
+  articledto.CreateArticleResponseDTO:
+    properties:
+      article_id:
+        type: integer
+      author:
+        $ref: '#/definitions/articledto.ArticleAuthor'
+      body:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      favorite_count:
+        type: integer
+      is_favorited:
+        type: boolean
+      tag_list:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+    type: object
+  articledto.CreateArticleResponseWrapperDTO:
+    properties:
+      article:
+        $ref: '#/definitions/articledto.CreateArticleResponseDTO'
+    type: object
+  articledto.ReadArticleByOffsetResponseWrapperDTO:
+    properties:
+      articles:
+        items:
+          $ref: '#/definitions/articledto.ReadArticleResponseDTO'
+        type: array
+    type: object
+  articledto.ReadArticleResponseDTO:
+    properties:
+      article_id:
+        type: integer
+      author:
+        $ref: '#/definitions/articledto.ArticleAuthor'
+      body:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      favorite_count:
+        type: integer
+      is_favorited:
+        type: boolean
+      tag_list:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+    type: object
+  articledto.ReadArticleResponseWrapperDTO:
+    properties:
+      article:
+        $ref: '#/definitions/articledto.ReadArticleResponseDTO'
+    type: object
+  articledto.UpdateArticleRequestDTO:
+    properties:
+      body:
+        type: string
+      description:
+        type: string
+      tag_list:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+    type: object
+  articledto.UpdateArticleResponseDTO:
+    properties:
+      article_id:
+        type: integer
+      body:
+        type: string
+      created_at:
+        description: |-
+          TagList       []string      `json:"tag_list"`
+          IsFavorited   bool          `json:"is_favorited"`
+          Author        ArticleAuthor `json:"author"`
+        type: string
+      description:
+        type: string
+      favorite_count:
+        type: integer
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  articledto.UpdateArticleResponseWrapperDTO:
+    properties:
+      article:
+        $ref: '#/definitions/articledto.UpdateArticleResponseDTO'
+    type: object
   authdto.SignInRequestDTO:
     properties:
       email:
@@ -114,6 +240,226 @@ info:
   title: Swagger Example API
   version: "1.0"
 paths:
+  /user/{user_id}/article:
+    post:
+      consumes:
+      - application/json
+      description: Create article
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: createArticleReq
+        in: body
+        name: createArticleReq
+        required: true
+        schema:
+          $ref: '#/definitions/articledto.CreateArticleRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: success
+          schema:
+            $ref: '#/definitions/articledto.CreateArticleResponseWrapperDTO'
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+        "422":
+          description: 요청을 제대로 수행하지 못함
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+        "500":
+          description: network error
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: Create article
+      tags:
+      - Article tag
+  /user/{user_id}/article/{article_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete article
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: user id
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      - description: article id
+        in: path
+        name: article_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: success
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+        "422":
+          description: 요청을 제대로 수행하지 못함
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+        "500":
+          description: network error
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: Delete article
+      tags:
+      - Article tag
+    get:
+      consumes:
+      - application/json
+      description: Read article by id
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: user id
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      - description: article id
+        in: path
+        name: article_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/articledto.ReadArticleResponseWrapperDTO'
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+        "404":
+          description: article not found
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+        "422":
+          description: 요청을 제대로 수행하지 못함
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+        "500":
+          description: network error
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: Read article by id
+      tags:
+      - Article tag
+    put:
+      consumes:
+      - application/json
+      description: Update article
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: user id
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      - description: article id
+        in: path
+        name: article_id
+        required: true
+        type: integer
+      - description: updateArticleReq
+        in: body
+        name: updateArticleReq
+        required: true
+        schema:
+          $ref: '#/definitions/articledto.UpdateArticleRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/articledto.UpdateArticleResponseWrapperDTO'
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+        "422":
+          description: 요청을 제대로 수행하지 못함
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+        "500":
+          description: network error
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: Update article
+      tags:
+      - Article tag
+  /user/{user_id}/articles:
+    get:
+      consumes:
+      - application/json
+      description: page, limit을 이용해서 article을 읽어옴(limit는 없는 경우 10으로 사용)
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: user id
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      - description: page
+        in: header
+        name: page
+        type: integer
+      - description: limit
+        in: header
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/articledto.ReadArticleByOffsetResponseWrapperDTO'
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+        "422":
+          description: 요청을 제대로 수행하지 못함
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+        "500":
+          description: network error
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: Read article by offset
+      tags:
+      - Article tag
   /user/{user_id}/profile:
     get:
       consumes:
@@ -143,10 +489,6 @@ paths:
             $ref: '#/definitions/types.ErrorResponse'
         "404":
           description: user not found
-          schema:
-            $ref: '#/definitions/types.ErrorResponse'
-        "422":
-          description: 요청을 제대로 수행하지 못함
           schema:
             $ref: '#/definitions/types.ErrorResponse'
         "500":

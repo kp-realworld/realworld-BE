@@ -2,14 +2,20 @@ package repository
 
 import (
 	"fmt"
-	"github.com/hotkimho/realworld-api/env"
-	"github.com/hotkimho/realworld-api/models"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+
+	"github.com/hotkimho/realworld-api/env"
+	"github.com/hotkimho/realworld-api/models"
 )
 
 var DB *gorm.DB
+
 var UserRepo *userRepository
+var ArticleRepo *articleRepository
+var ArticleTagRepo *articleTagRepository
+var ArticleLikeRepo *articleLikeRepository
 
 func Init() error {
 
@@ -33,8 +39,8 @@ func Init() error {
 
 	// Init Repositories
 	initRepositories()
-
-	err = DB.AutoMigrate(models.User{})
+	// models.Article{}, models.ArticleTag{}, models.ArticleLike{}
+	err = DB.AutoMigrate(models.User{}, models.Article{}, models.ArticleTag{}, models.ArticleLike{})
 	if err != nil {
 		return err
 	}
@@ -48,4 +54,7 @@ func makeDSN(user, password, host, name string, port int) string {
 
 func initRepositories() {
 	UserRepo = NewUserRepository()
+	ArticleRepo = NewArticleRepository()
+	ArticleTagRepo = NewArticleTagRepository()
+	ArticleLikeRepo = NewArticleLikeRepository()
 }
