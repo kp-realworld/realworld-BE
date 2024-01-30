@@ -2,7 +2,6 @@ package repository
 
 import (
 	"errors"
-	"fmt"
 
 	"gorm.io/gorm"
 
@@ -67,10 +66,9 @@ func (repo *articleRepository) CreateWithTransaction(db *gorm.DB, requestDTO art
 
 func (repo *articleRepository) GetByID(db *gorm.DB, articleID, userID int64) (*models.Article, error) {
 
-	db.Debug()
 	var article models.Article
 
-	err := db.Debug().Model(article).
+	err := db.Model(article).
 		Preload("User").
 		Preload("Likes").
 		Preload("Tags").
@@ -82,11 +80,36 @@ func (repo *articleRepository) GetByID(db *gorm.DB, articleID, userID int64) (*m
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
-		fmt.Println("??")
 		return nil, err
 	}
 
 	return &article, nil
+}
+
+func (repo *articleRepository) GetByOffset(db *gorm.DB, userID int64, offset, limit int) ([]models.Article, error) {
+
+	var articles []models.Article
+
+	// id로 내림차순
+	err := db.Model(&articles).
+		Preload("User").
+		Preload("Likes").
+		Preload("Tags").
+		Order("id desc").
+		Offset(offset).
+		Limit(limit).
+		Find(&articles).Error
+	if err != nil {
+		return nil, err
+	}
+
+	for _, article := range articles {
+		err = db.Model(article).Association("User").Find(&article.User)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return articles, nil
 }
 
 func (repo *articleRepository) UpdateByID(db *gorm.DB, requestDTO articledto.UpdateArticleRequestDTO, articleID, userID int64) (*models.Article, error) {

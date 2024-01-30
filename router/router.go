@@ -83,6 +83,11 @@ var ArticleRouter = [][]*Route{
 			Path:        "/user/{user_id}/article/{article_id}",
 			HandlerFunc: article.DeleteArticle,
 		},
+		{
+			Method:      "GET",
+			Path:        "/user/{user_id}/articles",
+			HandlerFunc: article.ReadArticleByOffset,
+		},
 	},
 }
 

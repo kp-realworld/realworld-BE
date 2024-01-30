@@ -16,6 +16,7 @@ type ArticleAuthor struct {
 }
 
 type CreateArticleResponseDTO struct {
+	ID            int64         `json:"id"`
 	Title         string        `json:"title"`
 	Description   string        `json:"description"`
 	Body          string        `json:"body"`
@@ -31,6 +32,7 @@ type CreateArticleResponseWrapperDTO struct {
 }
 
 type ReadArticleResponseDTO struct {
+	ID            int64         `json:"id"`
 	Title         string        `json:"title"`
 	Description   string        `json:"description"`
 	Body          string        `json:"body"`
@@ -45,7 +47,7 @@ type ReadArticleResponseWrapperDTO struct {
 	Article ReadArticleResponseDTO `json:"article"`
 }
 
-type ReadArticleListResponseDTO struct {
+type ReadArticleByOffsetResponseWrapperDTO struct {
 	Articles []ReadArticleResponseDTO `json:"articles"`
 }
 
@@ -57,15 +59,16 @@ type UpdateArticleRequestDTO struct {
 }
 
 type UpdateArticleResponseDTO struct {
-	Title         string        `json:"title"`
-	Description   string        `json:"description"`
-	Body          string        `json:"body"`
-	FavoriteCount int           `json:"favorite_count"`
-	TagList       []string      `json:"tag_list"`
-	IsFavorited   bool          `json:"is_favorited"`
-	Author        ArticleAuthor `json:"author"`
-	CreatedAt     time.Time     `json:"created_at"`
-	UpdatedAt     *time.Time    `json:"updated_at"`
+	ID            int64  `json:"id"`
+	Title         string `json:"title"`
+	Description   string `json:"description"`
+	Body          string `json:"body"`
+	FavoriteCount int    `json:"favorite_count"`
+	//TagList       []string      `json:"tag_list"`
+	//IsFavorited   bool          `json:"is_favorited"`
+	//Author        ArticleAuthor `json:"author"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt *time.Time `json:"updated_at"`
 }
 
 type UpdateArticleResponseWrapperDTO struct {

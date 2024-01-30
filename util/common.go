@@ -6,6 +6,8 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+
+	"github.com/hotkimho/realworld-api/types"
 )
 
 func GetIntegerParam[T int | int16 | int32 | int64](r *http.Request, key string) (T, error) {
@@ -35,4 +37,20 @@ func GetIntegerParam[T int | int16 | int32 | int64](r *http.Request, key string)
 	}
 
 	return result, nil
+}
+
+func GetOffsetAndLimit(r *http.Request) (int, int, error) {
+	page, err := strconv.Atoi(r.Header.Get("page"))
+	if err != nil {
+		page = 1
+	}
+
+	limit, err := strconv.Atoi(r.Header.Get("limit"))
+	if err != nil {
+		limit = types.DEFAULT_PAGE_LIMIT
+	}
+
+	offset := (page - 1) * limit
+
+	return int(offset), int(limit), nil
 }

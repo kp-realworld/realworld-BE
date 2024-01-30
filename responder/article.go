@@ -15,6 +15,7 @@ func CreateArticleResponse(w http.ResponseWriter, article models.Article, tagLis
 	fmt.Println("article : ", article)
 	wrapper := articledto.CreateArticleResponseWrapperDTO{
 		Article: articledto.CreateArticleResponseDTO{
+			ID:            article.ID,
 			Title:         article.Title,
 			Description:   article.Description,
 			Body:          article.Body,
@@ -55,6 +56,7 @@ func ReadArticleByIDResponse(w http.ResponseWriter, article models.Article) {
 
 	wrapper := articledto.ReadArticleResponseWrapperDTO{
 		Article: articledto.ReadArticleResponseDTO{
+			ID:            article.ID,
 			Title:         article.Title,
 			Description:   article.Body,
 			Body:          article.Body,
@@ -80,15 +82,61 @@ func ReadArticleByIDResponse(w http.ResponseWriter, article models.Article) {
 	w.Write(jsonData)
 }
 
+func ReadArticleByOffsetResponse(w http.ResponseWriter, articles []models.Article) {
+
+	articleList := make([]articledto.ReadArticleResponseDTO, 0)
+
+	for _, article := range articles {
+
+		isLiked := false
+		if len(article.Likes) > 0 {
+			isLiked = true
+		}
+
+		tagList := make([]string, 0)
+		for _, tag := range article.Tags {
+			tagList = append(tagList, tag.Tag)
+		}
+
+		articleList = append(articleList, articledto.ReadArticleResponseDTO{
+			ID:            article.ID,
+			Title:         article.Title,
+			Description:   article.Body,
+			Body:          article.Body,
+			FavoriteCount: article.FavoriteCount,
+			IsFavorited:   isLiked,
+			TagList:       tagList,
+			Author: articledto.ArticleAuthor{
+				Username:     article.User.Username,
+				Bio:          article.User.Bio,
+				ProfileImage: article.User.ProfileImage,
+			},
+		})
+	}
+
+	wrapper := articledto.ReadArticleByOffsetResponseWrapperDTO{
+		Articles: articleList,
+	}
+
+	jsonData, err := json.Marshal(wrapper)
+	if err != nil {
+		ErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonData)
+}
+
 func UpdateArticleResponse(w http.ResponseWriter, article models.Article, tagList []string) {
 
-	fmt.Println("article : ", article)
 	wrapper := articledto.UpdateArticleResponseWrapperDTO{
 		Article: articledto.UpdateArticleResponseDTO{
+			ID:            article.ID,
 			Title:         article.Title,
 			Description:   article.Description,
 			Body:          article.Body,
-			TagList:       tagList,
 			FavoriteCount: article.FavoriteCount,
 			UpdatedAt:     article.UpdatedAt,
 		},
