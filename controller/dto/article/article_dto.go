@@ -42,6 +42,7 @@ type ReadArticleResponseDTO struct {
 	IsFavorited   bool          `json:"is_favorited"`
 	Author        ArticleAuthor `json:"author"`
 	CreatedAt     time.Time     `json:"created_at"`
+	UpdatedAt     *time.Time    `json:"updated_at,omitempty"`
 }
 
 type ReadArticleResponseWrapperDTO struct {
@@ -69,7 +70,7 @@ type UpdateArticleResponseDTO struct {
 	//IsFavorited   bool          `json:"is_favorited"`
 	//Author        ArticleAuthor `json:"author"`
 	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt *time.Time `json:"updated_at"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 }
 
 type UpdateArticleResponseWrapperDTO struct {

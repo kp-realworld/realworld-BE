@@ -2,7 +2,6 @@ package repository
 
 import (
 	"errors"
-
 	"gorm.io/gorm"
 
 	articledto "github.com/hotkimho/realworld-api/controller/dto/article"
@@ -33,6 +32,7 @@ func (repo *articleRepository) Create(db *gorm.DB, requestDTO articledto.CreateA
 	if err != nil {
 		return nil, err
 	}
+
 	return &article, nil
 }
 
@@ -85,7 +85,7 @@ func (repo *articleRepository) GetByID(db *gorm.DB, articleID, userID int64) (*m
 	return &article, nil
 }
 
-func (repo *articleRepository) GetByOffset(db *gorm.DB, userID int64, offset, limit int) ([]models.Article, error) {
+func (repo *articleRepository) GetByOffset(db *gorm.DB, offset, limit int) ([]models.Article, error) {
 
 	var articles []models.Article
 
@@ -102,18 +102,15 @@ func (repo *articleRepository) GetByOffset(db *gorm.DB, userID int64, offset, li
 		return nil, err
 	}
 
-	for _, article := range articles {
-		err = db.Model(article).Association("User").Find(&article.User)
-		if err != nil {
-			return nil, err
-		}
-	}
 	return articles, nil
 }
 
 func (repo *articleRepository) UpdateByID(db *gorm.DB, requestDTO articledto.UpdateArticleRequestDTO, articleID, userID int64) (*models.Article, error) {
 
-	var article models.Article
+	article := models.Article{
+		ID:     articleID,
+		UserID: userID,
+	}
 
 	updateData := map[string]interface{}{}
 
@@ -129,9 +126,24 @@ func (repo *articleRepository) UpdateByID(db *gorm.DB, requestDTO articledto.Upd
 		updateData["body"] = *requestDTO.Body
 	}
 
-	err := db.Model(&article).Where(&models.Article{
-		ID: articleID,
-	}).Updates(updateData).First(&article).Error
+	// 먼저 게시글이 있는지 확인
+	err := db.Model(&models.Article{}).
+		Where(article).
+		First(&article).
+		Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	err = db.Model(article).
+		//Where(&article).
+		Updates(updateData).
+		First(&article).
+		Error
 	if err != nil {
 		return nil, err
 	}
@@ -141,9 +153,22 @@ func (repo *articleRepository) UpdateByID(db *gorm.DB, requestDTO articledto.Upd
 
 func (repo *articleRepository) DeleteByID(db *gorm.DB, articleID, userID int64) error {
 
-	err := db.Where(&models.Article{
-		ID: articleID,
-	}).Delete(&models.Article{}).Error
+	article := models.Article{
+		ID:     articleID,
+		UserID: userID,
+	}
+	// 먼저 게시글이 있는지 확인
+	err := db.Model(&models.Article{}).
+		Where(article).
+		First(&article).
+		Error
+	if err != nil {
+		return err
+	}
+
+	err = db.Where(article).
+		Delete(&models.Article{}).
+		Error
 	if err != nil {
 		return err
 	}
@@ -159,6 +184,9 @@ func (repo *articleRepository) UpdateWithTransaction(db *gorm.DB, requestDTO art
 	if err != nil {
 		tx.Rollback()
 		return nil, err
+	} else if article == nil {
+		tx.Rollback()
+		return nil, nil
 	}
 
 	err = NewArticleTagRepository().Update(tx, articleID, requestDTO.TagList)
@@ -174,4 +202,19 @@ func (repo *articleRepository) UpdateWithTransaction(db *gorm.DB, requestDTO art
 	}
 
 	return article, nil
+}
+
+func (repo *articleRepository) ValidateArticleOwner(db *gorm.DB, articleID, userID int64) error {
+
+	var article models.Article
+
+	err := db.Model(&article).Where(&models.Article{
+		ID:     articleID,
+		UserID: userID,
+	}).First(&article).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
