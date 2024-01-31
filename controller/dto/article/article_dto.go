@@ -6,13 +6,13 @@ type CreateArticleRequestDTO struct {
 	Title       string   `json:"title"`
 	Description string   `json:"description"`
 	Body        string   `json:"body"`
-	TagList     []string `json:"tag_list",omitempty`
+	TagList     []string `json:"tag_list,omitempty"`
 }
 
 type ArticleAuthor struct {
 	AuthorID     int64   `json:"author_id"`
 	Username     string  `json:"username"`
-	Bio          *string `json:"bio",omitempty`
+	Bio          *string `json:"bio,omitempty"`
 	ProfileImage string  `json:"profile_image"`
 }
 
@@ -22,7 +22,7 @@ type CreateArticleResponseDTO struct {
 	Description   string        `json:"description"`
 	Body          string        `json:"body"`
 	FavoriteCount int           `json:"favorite_count"`
-	TagList       []string      `json:"tag_list",omitempty`
+	TagList       []string      `json:"tag_list,omitempty"`
 	IsFavorited   bool          `json:"is_favorited"`
 	Author        ArticleAuthor `json:"author"`
 	CreatedAt     time.Time     `json:"created_at"`
@@ -38,7 +38,7 @@ type ReadArticleResponseDTO struct {
 	Description   string        `json:"description"`
 	Body          string        `json:"body"`
 	FavoriteCount int           `json:"favorite_count"`
-	TagList       []string      `json:"tag_list"`
+	TagList       []string      `json:"tag_list,omitempty"`
 	IsFavorited   bool          `json:"is_favorited"`
 	Author        ArticleAuthor `json:"author"`
 	CreatedAt     time.Time     `json:"created_at"`
@@ -53,10 +53,10 @@ type ReadArticleByOffsetResponseWrapperDTO struct {
 }
 
 type UpdateArticleRequestDTO struct {
-	Title       *string  `json:"title"`
-	Description *string  `json:"description"`
-	Body        *string  `json:"body"`
-	TagList     []string `json:"tag_list"`
+	Title       *string  `json:"title,omitempty"`
+	Description *string  `json:"description,omitempty"`
+	Body        *string  `json:"body,omitempty"`
+	TagList     []string `json:"tag_list,omitempty"`
 }
 
 type UpdateArticleResponseDTO struct {
