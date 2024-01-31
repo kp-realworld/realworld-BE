@@ -14,6 +14,8 @@ type UpdateUserProfileRequestDTO struct {
 	Username     *string `json:"username"`
 	Bio          *string `json:"bio"`
 	ProfileImage *string `json:"profile_image"`
+	Email        *string `json:"email"`
+	Password     *string `json:"password"`
 }
 
 func (dtd *UpdateUserProfileRequestDTO) IsEmpty() bool {

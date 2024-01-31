@@ -1,13 +1,14 @@
 package router
 
 import (
+	"context"
 	"fmt"
-	"net/http"
-
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
+	"github.com/hotkimho/realworld-api/controller/comment"
 	"github.com/rs/cors"
 	httpSwagger "github.com/swaggo/http-swagger"
+	"net/http"
 
 	"github.com/hotkimho/realworld-api/controller/article"
 	"github.com/hotkimho/realworld-api/controller/auth"
@@ -28,6 +29,7 @@ func (m *Router) Init() {
 	m.InitSwagger()
 	m.InitCORS()
 	m.AddRoute(ArticleRouter)
+	m.AddRoute(CommentRouter)
 	m.AddRoute([][]*Route{
 		{
 			{
@@ -49,7 +51,7 @@ func (m *Router) Init() {
 				Method:      "GET",
 				Path:        "/user/{user_id}/profile",
 				HandlerFunc: user.ReadUserProfile,
-				Middleware:  []Middleware{AuthMiddleware},
+				Middleware:  []Middleware{UserAuthMiddleware},
 			},
 			{
 				Method:      "PUT",
@@ -67,6 +69,7 @@ var ArticleRouter = [][]*Route{
 			Method:      "POST",
 			Path:        "/user/{user_id}/article",
 			HandlerFunc: article.CreateArticle,
+			Middleware:  []Middleware{UserAuthMiddleware},
 		},
 		{
 			Method:      "GET",
@@ -77,16 +80,46 @@ var ArticleRouter = [][]*Route{
 			Method:      "PUT",
 			Path:        "/user/{user_id}/article/{article_id}",
 			HandlerFunc: article.UpdateArticle,
+			Middleware:  []Middleware{UserAuthMiddleware},
 		},
 		{
 			Method:      "DELETE",
 			Path:        "/user/{user_id}/article/{article_id}",
 			HandlerFunc: article.DeleteArticle,
+			Middleware:  []Middleware{UserAuthMiddleware},
 		},
 		{
 			Method:      "GET",
-			Path:        "/user/{user_id}/articles",
+			Path:        "/articles",
 			HandlerFunc: article.ReadArticleByOffset,
+		},
+	},
+}
+
+var CommentRouter = [][]*Route{
+	{
+		{
+			Method:      "POST",
+			Path:        "/user/{user_id}/article/{article_id}/comment",
+			HandlerFunc: comment.CreateComment,
+			Middleware:  []Middleware{UserAuthMiddleware},
+		},
+		{
+			Method:      "GET",
+			Path:        "/user/{user_id}/article/{article_id}/comments",
+			HandlerFunc: comment.ReadComments,
+		},
+		{
+			Method:      "PUT",
+			Path:        "/user/{user_id}/article/{article_id}/comment/{comment_id}",
+			HandlerFunc: comment.UpdateComment,
+			Middleware:  []Middleware{UserAuthMiddleware},
+		},
+		{
+			Method:      "DELETE",
+			Path:        "/user/{user_id}/article/{article_id}/comment/{comment_id}",
+			HandlerFunc: comment.DeleteComment,
+			Middleware:  []Middleware{UserAuthMiddleware},
 		},
 	},
 }
@@ -167,13 +200,12 @@ func LoggingMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
+func UserAuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		token := r.Header.Get("Authorization")
 		if token == "" {
 			responder.ErrorResponse(w, http.StatusUnauthorized, "token is empty")
-			//w.WriteHeader(401)
 			return
 		}
 
@@ -185,15 +217,35 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		if _, ok := parsedToken.Claims.(*types.JWTClaims); ok && parsedToken.Valid {
-
+		var userID int64
+		if claim, ok := parsedToken.Claims.(*types.JWTClaims); ok && parsedToken.Valid {
+			// 토큰의 ID 와 요청의 ID 가 일치하는지 확인
+			if claim.UserID <= 0 {
+				responder.ErrorResponse(w, http.StatusBadRequest, "token is invalid")
+				return
+			}
+			userID = claim.UserID
+			// 필요 시, api path의 user_id 와 토큰의 user_id 를 비교
+			//vars := mux.Vars(r)
+			//val, ok := vars["user_id"]
+			//if !ok {
+			//	responder.ErrorResponse(w, http.StatusBadRequest, "user_id is empty")
+			//	return
+			//}
+			//
+			//currentUserID, err := strconv.ParseInt(val, 10, 64)
+			//if err != nil {
+			//	responder.ErrorResponse(w, http.StatusBadRequest, "user_id is invalid")
+			//	return
+			//}
 		} else {
 			responder.ErrorResponse(w, http.StatusUnauthorized, "token is invalid")
 			w.WriteHeader(401)
 			return
 		}
 
-		next(w, r)
+		ctx := context.WithValue(r.Context(), "ctx_user_id", userID)
+		next(w, r.WithContext(ctx))
 	}
 }
 

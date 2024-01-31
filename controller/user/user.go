@@ -2,6 +2,7 @@ package user
 
 import (
 	"encoding/json"
+	"github.com/hotkimho/realworld-api/controller/auth"
 	"net/http"
 	"strconv"
 
@@ -89,7 +90,17 @@ func UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := repository.UserRepo.UpdateUserProfileByID(repository.DB, updateUserProfileReq, userID)
+	var password *string
+	if updateUserProfileReq.Password != nil {
+		hashedPass, err := auth.HashPassword(*updateUserProfileReq.Password)
+		if err != nil {
+			responder.ErrorResponse(w, http.StatusUnprocessableEntity, err.Error())
+			return
+		}
+		password = &hashedPass
+	}
+
+	user, err := repository.UserRepo.UpdateUserProfileByID(repository.DB, updateUserProfileReq, userID, password)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return

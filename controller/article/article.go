@@ -10,17 +10,17 @@ import (
 	"github.com/hotkimho/realworld-api/util"
 )
 
-// @Summary Create article
-// @Description Create article
+// @Summary 기사 생성
+// @Description 기사를 생성합니다.
 // @Tags Article tag
 // @Accept json
 // @Produce json
 // @Param authorization header string true "jwt token"
-// @Param createArticleReq body articledto.CreateArticleRequestDTO true "createArticleReq"
-// @Success 201 {object} articledto.CreateArticleResponseWrapperDTO "success"
-// @Failure 400 {object} types.ErrorResponse "bad request"
+// @Param createArticleReq body articledto.CreateArticleRequestDTO true "기사 생성 내용"
+// @Success 201 {object} articledto.CreateArticleResponseWrapperDTO "정상적으로 생성됨"
+// @Failure 400 {object} types.ErrorResponse "입력값이 유효하지 않음"
 // @Failure 422 {object} types.ErrorResponse "요청을 제대로 수행하지 못함"
-// @Failure 500 {object} types.ErrorResponse "network error"
+// @Failure 500 {object} types.ErrorResponse "네트워크 에러"
 // @Router /user/{user_id}/article [post]
 func CreateArticle(w http.ResponseWriter, r *http.Request) {
 
@@ -60,14 +60,13 @@ func CreateArticle(w http.ResponseWriter, r *http.Request) {
 // @Tags Article tag
 // @Accept json
 // @Produce json
-// @Param authorization header string true "jwt token"
-// @Param user_id path int true "user id"
-// @Param article_id path int true "article id"
+// @Param user_id path int true "article author id(기사 소유자)"
+// @Param article_id path int true "article id(기사 ID)"
 // @Success 200 {object} articledto.ReadArticleResponseWrapperDTO "success"
-// @Failure 400 {object} types.ErrorResponse "bad request"
-// @Failure 404 {object} types.ErrorResponse "article not found"
+// @Failure 400 {object} types.ErrorResponse "입력값이 유효하지 않음"
+// @Failure 404 {object} types.ErrorResponse "기사를 찾을 수 없음"
 // @Failure 422 {object} types.ErrorResponse "요청을 제대로 수행하지 못함"
-// @Failure 500 {object} types.ErrorResponse "network error"
+// @Failure 500 {object} types.ErrorResponse "네트워크 에러"
 // @Router /user/{user_id}/article/{article_id} [get]
 func ReadArticleByID(w http.ResponseWriter, r *http.Request) {
 
@@ -99,22 +98,14 @@ func ReadArticleByID(w http.ResponseWriter, r *http.Request) {
 // @Tags Article tag
 // @Accept json
 // @Produce json
-// @Param authorization header string true "jwt token"
-// @Param user_id path int true "user id"
 // @Param page header int false "page"
 // @Param limit header int false "limit"
 // @Success 200 {object} articledto.ReadArticleByOffsetResponseWrapperDTO "success"
-// @Failure 400 {object} types.ErrorResponse "bad request"
+// @Failure 400 {object} types.ErrorResponse "입력값이 유효하지 않음"
 // @Failure 422 {object} types.ErrorResponse "요청을 제대로 수행하지 못함"
-// @Failure 500 {object} types.ErrorResponse "network error"
-// @Router /user/{user_id}/articles [get]
+// @Failure 500 {object} types.ErrorResponse "네트워크 에러"
+// @Router /articles [get]
 func ReadArticleByOffset(w http.ResponseWriter, r *http.Request) {
-
-	userID, err := util.GetIntegerParam[int64](r, "user_id")
-	if err != nil {
-		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
-		return
-	}
 
 	page, limit, err := util.GetOffsetAndLimit(r)
 	if err != nil {
@@ -122,7 +113,7 @@ func ReadArticleByOffset(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	articles, err := repository.ArticleRepo.GetByOffset(repository.DB, userID, page, limit)
+	articles, err := repository.ArticleRepo.GetByOffset(repository.DB, page, limit)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
@@ -137,8 +128,8 @@ func ReadArticleByOffset(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param authorization header string true "jwt token"
-// @Param user_id path int true "user id"
-// @Param article_id path int true "article id"
+// @Param user_id path int true "article author id(기사 소유자)"
+// @Param article_id path int true "article id(기사 ID)"
 // @Param updateArticleReq body  articledto.UpdateArticleRequestDTO true "updateArticleReq"
 // @Success 200 {object}  articledto.UpdateArticleResponseWrapperDTO "success"
 // @Failure 400 {object} types.ErrorResponse "bad request"
@@ -171,6 +162,13 @@ func UpdateArticle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	article, err := repository.ArticleRepo.UpdateWithTransaction(repository.DB, updateArticleReq, userID, articleID)
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	} else if article == nil {
+		responder.ErrorResponse(w, http.StatusBadRequest, "invalid request")
+		return
+	}
 
 	responder.UpdateArticleResponse(w, *article, updateArticleReq.TagList)
 }
@@ -181,8 +179,8 @@ func UpdateArticle(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param authorization header string true "jwt token"
-// @Param user_id path int true "user id"
-// @Param article_id path int true "article id"
+// @Param user_id path int true "article author id(기사 소유자)"
+// @Param article_id path int true "article id(기사 ID)"
 // @Success 204 "success"
 // @Failure 400 {object} types.ErrorResponse "bad request"
 // @Failure 422 {object} types.ErrorResponse "요청을 제대로 수행하지 못함"

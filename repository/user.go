@@ -58,7 +58,7 @@ func (repo *userRepository) GetByID(db *gorm.DB, id int64) (*models.User, error)
 	return &user, nil
 }
 
-func (repo *userRepository) UpdateUserProfileByID(db *gorm.DB, updateRequest userdto.UpdateUserProfileRequestDTO, id int64) (*models.User, error) {
+func (repo *userRepository) UpdateUserProfileByID(db *gorm.DB, updateRequest userdto.UpdateUserProfileRequestDTO, id int64, password *string) (*models.User, error) {
 
 	var user models.User
 
@@ -72,6 +72,12 @@ func (repo *userRepository) UpdateUserProfileByID(db *gorm.DB, updateRequest use
 	}
 	if updateRequest.ProfileImage != nil {
 		updateData["profile_image"] = *updateRequest.ProfileImage
+	}
+	if updateRequest.Email != nil {
+		updateData["email"] = *updateRequest.Email
+	}
+	if password != nil {
+		updateData["password"] = password
 	}
 
 	err := db.Model(&models.User{UserID: id}).Updates(updateData).First(&user).Error
