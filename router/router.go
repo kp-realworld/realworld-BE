@@ -9,6 +9,7 @@ import (
 	"github.com/rs/cors"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
+	"strings"
 
 	"github.com/hotkimho/realworld-api/controller/article"
 	"github.com/hotkimho/realworld-api/controller/auth"
@@ -57,7 +58,12 @@ func (m *Router) Init() {
 				Method:      "PUT",
 				Path:        "/user/{user_id}/profile",
 				HandlerFunc: user.UpdateUserProfile,
-				//Middleware:  []Middleware{authMiddleware},
+				Middleware:  []Middleware{UserAuthMiddleware},
+			},
+			{
+				Method:      "GET",
+				Path:        "/user/{user_id}/token-refresh",
+				HandlerFunc: auth.RefreshToken,
 			},
 		},
 	})
@@ -75,6 +81,7 @@ var ArticleRouter = [][]*Route{
 			Method:      "GET",
 			Path:        "/user/{user_id}/article/{article_id}",
 			HandlerFunc: article.ReadArticleByID,
+			Middleware:  []Middleware{UserAuthMiddleware},
 		},
 		{
 			Method:      "PUT",
@@ -213,6 +220,11 @@ func UserAuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			return []byte(env.Config.Auth.Secret), nil
 		})
 		if err != nil {
+			// 토큰 만료
+			if strings.Compare(err.Error(), types.ERR_EXPIRED_TOKEN) == 0 {
+				responder.ErrorResponse(w, http.StatusUnauthorized, "Token expired")
+				return
+			}
 			responder.ErrorResponse(w, http.StatusUnauthorized, "token is invalid")
 			return
 		}
@@ -239,6 +251,7 @@ func UserAuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			//	return
 			//}
 		} else {
+			fmt.Println("err : ", err.Error())
 			responder.ErrorResponse(w, http.StatusUnauthorized, "token is invalid")
 			w.WriteHeader(401)
 			return

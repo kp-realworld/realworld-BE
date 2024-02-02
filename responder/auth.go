@@ -48,3 +48,18 @@ func SignUpResponse(w http.ResponseWriter, requestDTO authdto.SignUpRequestDTO, 
 	w.WriteHeader(http.StatusCreated)
 	w.Write(jsonData)
 }
+func RefreshTokenResponse(w http.ResponseWriter, token string) {
+	wrapper := authdto.RefreshTokenResponseDTO{
+		Token: token,
+	}
+
+	jsonData, err := json.Marshal(wrapper)
+	if err != nil {
+		ErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonData)
+}

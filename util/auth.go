@@ -15,7 +15,8 @@ func IssueJWT(userID int64) (string, error) {
 	}
 
 	now := time.Now().In(env.Seoul)
-	ExpiredTime := now.Add(time.Hour * time.Duration(env.Config.Auth.AccessTokenExpire))
+	//ExpiredTime := now.Add(time.Hour * time.Duration(env.Config.Auth.AccessTokenExpire))
+	ExpiredTime := now.Add(time.Minute * 1)
 	claims := types.JWTClaims{
 		userID,
 		jwt.RegisteredClaims{
@@ -33,4 +34,19 @@ func IssueJWT(userID int64) (string, error) {
 	}
 
 	return signedToken, nil
+}
+
+func VerifyJWT(token string) (*types.JWTClaims, error) {
+	parsedToken, err := jwt.ParseWithClaims(token, &types.JWTClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(env.Config.Auth.Secret), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if claim, ok := parsedToken.Claims.(*types.JWTClaims); ok && parsedToken.Valid {
+		return claim, nil
+	}
+
+	return nil, errors.New("token is invalid")
 }
