@@ -33,6 +33,25 @@ type SignInResponseWrapperDTO struct {
 	User SignInResponseDTO `json:"user"`
 }
 
+// 토큰 갱신
 type RefreshTokenResponseDTO struct {
 	Token string `json:"token"`
+}
+
+// username 확인
+type VerifyUsernameRequestDTO struct {
+	Username string `json:"username" validate:"required"`
+}
+
+type VerifyUsernameResponseDTO struct {
+	Username string `json:"username,omitempty"`
+}
+
+// email 확인
+type VerifyEmailRequestDTO struct {
+	Email string `json:"email" validate:"required"`
+}
+
+type VerifyEmailResponseDTO struct {
+	Email string `json:"email,omitempty"`
 }

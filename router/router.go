@@ -3,13 +3,15 @@ package router
 import (
 	"context"
 	"fmt"
-	"github.com/golang-jwt/jwt/v5"
-	"github.com/gorilla/mux"
-	"github.com/hotkimho/realworld-api/controller/comment"
-	"github.com/rs/cors"
-	httpSwagger "github.com/swaggo/http-swagger"
 	"net/http"
 	"strings"
+
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/gorilla/mux"
+	"github.com/rs/cors"
+	httpSwagger "github.com/swaggo/http-swagger"
+
+	"github.com/hotkimho/realworld-api/controller/comment"
 
 	"github.com/hotkimho/realworld-api/controller/article"
 	"github.com/hotkimho/realworld-api/controller/auth"
@@ -64,6 +66,16 @@ func (m *Router) Init() {
 				Method:      "GET",
 				Path:        "/user/{user_id}/token-refresh",
 				HandlerFunc: auth.RefreshToken,
+			},
+			{
+				Method:      "POST",
+				Path:        "/user/verify-email",
+				HandlerFunc: auth.VerifyEmail,
+			},
+			{
+				Method:      "POST",
+				Path:        "/user/verify-username",
+				HandlerFunc: auth.VerifyUsername,
 			},
 		},
 	})

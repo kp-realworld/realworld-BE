@@ -2,10 +2,13 @@ package util
 
 import (
 	"errors"
+	"regexp"
+	"time"
+
 	"github.com/golang-jwt/jwt/v5"
+
 	"github.com/hotkimho/realworld-api/env"
 	"github.com/hotkimho/realworld-api/types"
-	"time"
 )
 
 // 로그인 시, jwt 토큰 발급 함수
@@ -49,4 +52,9 @@ func VerifyJWT(token string) (*types.JWTClaims, error) {
 	}
 
 	return nil, errors.New("token is invalid")
+}
+
+func VerifyEmail(email string) bool {
+	regex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
+	return regex.MatchString(email)
 }

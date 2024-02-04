@@ -33,13 +33,6 @@
                 "summary": "Read article by offset",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "jwt token",
-                        "name": "authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
                         "type": "integer",
                         "description": "page",
                         "name": "page",
@@ -178,6 +171,110 @@
                 }
             }
         },
+        "/user/verify-email": {
+            "post": {
+                "description": "이메일 중복 확인",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth tag"
+                ],
+                "summary": "이메일 중복 확인",
+                "parameters": [
+                    {
+                        "description": "verifyEmailReq",
+                        "name": "verifyEmailReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/authdto.VerifyEmailRequestDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/authdto.VerifyEmailResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "입력값이 유효하지 않음",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "이미 존재하는 email",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "network error",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/verify-username": {
+            "post": {
+                "description": "유저네임 중복 확인",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth tag"
+                ],
+                "summary": "유저네임 중복 확인",
+                "parameters": [
+                    {
+                        "description": "verifyUsernameReq",
+                        "name": "verifyUsernameReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/authdto.VerifyUsernameRequestDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/authdto.VerifyUsernameResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "입력값이 유효하지 않음",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "이미 존재하는 username",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "network error",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/user/{user_id}/article": {
             "post": {
                 "description": "기사를 생성합니다.",
@@ -251,13 +348,6 @@
                 ],
                 "summary": "Read article by id",
                 "parameters": [
-                    {
-                        "type": "string",
-                        "description": "jwt token",
-                        "name": "authorization",
-                        "in": "header",
-                        "required": true
-                    },
                     {
                         "type": "integer",
                         "description": "article author id(기사 소유자)",
@@ -575,12 +665,6 @@
                             "$ref": "#/definitions/types.ErrorResponse"
                         }
                     },
-                    "404": {
-                        "description": "댓글을 찾을 수 없는 경우",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    },
                     "422": {
                         "description": "요청을 처리하지 못한 경우",
                         "schema": {
@@ -830,6 +914,50 @@
                     }
                 }
             }
+        },
+        "/user/{user_id}/refresh": {
+            "get": {
+                "description": "토큰 갱신",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth tag"
+                ],
+                "summary": "토큰 갱신",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/authdto.RefreshTokenResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "입력값이 유효하지 않음",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "network error",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -1025,6 +1153,14 @@
                 }
             }
         },
+        "authdto.RefreshTokenResponseDTO": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
         "authdto.SignInRequestDTO": {
             "type": "object",
             "required": [
@@ -1100,6 +1236,44 @@
             "properties": {
                 "user": {
                     "$ref": "#/definitions/authdto.SignUpResponseDTO"
+                }
+            }
+        },
+        "authdto.VerifyEmailRequestDTO": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                }
+            }
+        },
+        "authdto.VerifyEmailResponseDTO": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                }
+            }
+        },
+        "authdto.VerifyUsernameRequestDTO": {
+            "type": "object",
+            "required": [
+                "username"
+            ],
+            "properties": {
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "authdto.VerifyUsernameResponseDTO": {
+            "type": "object",
+            "properties": {
+                "username": {
+                    "type": "string"
                 }
             }
         },

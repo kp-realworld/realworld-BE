@@ -2,10 +2,12 @@ package repository
 
 import (
 	"errors"
-	"github.com/hotkimho/realworld-api/controller/dto/user"
-	"github.com/hotkimho/realworld-api/models"
+
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
+
+	"github.com/hotkimho/realworld-api/controller/dto/user"
+	"github.com/hotkimho/realworld-api/models"
 )
 
 type userRepository struct{}
@@ -29,6 +31,24 @@ func (repo *userRepository) GetByEmail(db *gorm.DB, email string) (*models.User,
 	var user models.User
 
 	err := db.Where(&models.User{Email: email}).First(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+
+		logrus.Error(err)
+
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func (repo *userRepository) GetByUsername(db *gorm.DB, username string) (*models.User, error) {
+
+	var user models.User
+
+	err := db.Where(&models.User{Email: username}).First(&user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil

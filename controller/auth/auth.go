@@ -2,15 +2,17 @@ package auth
 
 import (
 	"encoding/json"
+	"net/http"
+	"strings"
+
 	"github.com/golang-jwt/jwt/v5"
+
 	authdto "github.com/hotkimho/realworld-api/controller/dto/auth"
 	"github.com/hotkimho/realworld-api/env"
 	"github.com/hotkimho/realworld-api/repository"
 	"github.com/hotkimho/realworld-api/responder"
 	"github.com/hotkimho/realworld-api/types"
 	"github.com/hotkimho/realworld-api/util"
-	"net/http"
-	"strings"
 )
 
 func Heartbeat(w http.ResponseWriter, r *http.Request) {
@@ -117,7 +119,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 // @Tags Auth tag
 // @Accept json
 // @Produce json
-// @Param refreshTokenReq body authdto.RefreshTokenRequestDTO true
+// @Param authorization header string true "jwt token"
 // @Success 200 {object} authdto.RefreshTokenResponseDTO "success"
 // @Failure 400 {object} types.ErrorResponse "입력값이 유효하지 않음"
 // @Failure 500 {object} types.ErrorResponse "network error"
@@ -160,4 +162,83 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) {
 	}
 
 	responder.RefreshTokenResponse(w, jwtToken)
+}
+
+// @Summary 유저네임 중복 확인
+// @Description 유저네임 중복 확인
+// @Tags Auth tag
+// @Accept json
+// @Produce json
+// @Param verifyUsernameReq body authdto.VerifyUsernameRequestDTO true "verifyUsernameReq"
+// @Success 200 {object} authdto.VerifyUsernameResponseDTO "success"
+// @Failure 400 {object} types.ErrorResponse "입력값이 유효하지 않음"
+// @Failure 409 {object} types.ErrorResponse "이미 존재하는 username"
+// @Failure 500 {object} types.ErrorResponse "network error"
+// @Router /user/verify-username [post]
+func VerifyUsername(w http.ResponseWriter, r *http.Request) {
+
+	var verifyReq authdto.VerifyUsernameRequestDTO
+
+	err := json.NewDecoder(r.Body).Decode(&verifyReq)
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := ValidateVerifyUsernameRequestDTO(verifyReq); err != nil {
+		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	user, err := repository.UserRepo.GetByUsername(repository.DB, verifyReq.Username)
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	} else if user != nil {
+		responder.ErrorResponse(w, http.StatusConflict, "already username")
+	}
+
+	responder.VerifyUsernameResponse(w, verifyReq.Username)
+}
+
+// @Summary 이메일 중복 확인
+// @Description 이메일 중복 확인
+// @Tags Auth tag
+// @Accept json
+// @Produce json
+// @Param verifyEmailReq body authdto.VerifyEmailRequestDTO true "verifyEmailReq"
+// @Success 200 {object} authdto.VerifyEmailResponseDTO "success"
+// @Failure 400 {object} types.ErrorResponse "입력값이 유효하지 않거나 이메일 형식이 아님"
+// @Failure 409 {object} types.ErrorResponse "이미 존재하는 email"
+// @Failure 500 {object} types.ErrorResponse "network error"
+// @Router /user/verify-email [post]
+func VerifyEmail(w http.ResponseWriter, r *http.Request) {
+
+	var verifyReq authdto.VerifyEmailRequestDTO
+
+	err := json.NewDecoder(r.Body).Decode(&verifyReq)
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := ValidateVerifyEmailRequestDTO(verifyReq); err != nil {
+		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if !util.VerifyEmail(verifyReq.Email) {
+		responder.ErrorResponse(w, http.StatusBadRequest, "invalid email")
+		return
+	}
+
+	user, err := repository.UserRepo.GetByEmail(repository.DB, verifyReq.Email)
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	} else if user != nil {
+		responder.ErrorResponse(w, http.StatusConflict, "already email")
+	}
+
+	responder.VerifyEmailResponse(w, verifyReq.Email)
 }
