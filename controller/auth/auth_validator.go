@@ -12,3 +12,11 @@ func ValidateSignUpRequestDTO(requestDTO authdto.SignUpRequestDTO) error {
 func ValidateSignInRequestDTO(requestDTO authdto.SignInRequestDTO) error {
 	return controller.Validate.Struct(requestDTO)
 }
+
+func ValidateVerifyEmailRequestDTO(requestDTO authdto.VerifyEmailRequestDTO) error {
+	return controller.Validate.Struct(requestDTO)
+}
+
+func ValidateVerifyUsernameRequestDTO(requestDTO authdto.VerifyUsernameRequestDTO) error {
+	return controller.Validate.Struct(requestDTO)
+}
