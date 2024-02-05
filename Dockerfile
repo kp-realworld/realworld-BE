@@ -6,4 +6,4 @@ COPY . .
 RUN go mod tidy
 
 RUN go build -o realworld
-CMD ["./realworld","--config=./config/local-env.toml"]
+CMD ["./realworld","--config=./config/dev-env.toml"]
