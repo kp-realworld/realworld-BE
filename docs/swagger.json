@@ -203,7 +203,7 @@
                         }
                     },
                     "400": {
-                        "description": "입력값이 유효하지 않음",
+                        "description": "입력값이 유효하지 않거나 이메일 형식이 아님",
                         "schema": {
                             "$ref": "#/definitions/types.ErrorResponse"
                         }
