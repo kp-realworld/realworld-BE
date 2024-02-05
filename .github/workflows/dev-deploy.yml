@@ -3,6 +3,9 @@ name: develop branch auto deploy
 on:
   push:
     branches: [develop]
+  workflow_dispatch:
+
+
 
 jobs:
   deploy:
