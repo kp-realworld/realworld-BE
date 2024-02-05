@@ -1,0 +1,24 @@
+name: develop branch auto deploy
+
+on:
+  push:
+    branches: [feature/github-action]
+
+jobs:
+  deploy:
+    name: develop env deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PUBLIC_IP }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /home/ubuntu/workspace/realworld-api
+            ls
