@@ -2,7 +2,7 @@ name: develop branch auto deploy
 
 on:
   push:
-    branches: [feature/github-action]
+    branches: [develop]
 
 jobs:
   deploy:
@@ -21,4 +21,5 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd /home/ubuntu/workspace/realworld-api
+            git pull origin develop
             bash docker-start.sh
