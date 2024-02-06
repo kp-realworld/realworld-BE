@@ -7,6 +7,10 @@
 # 실행 중인 컨테이너의 이름 또는 ID 설정
 CONTAINER_NAME="realworld-api"
 
+# 도커 캐시 삭제
+echo "Cleaning Docker Cache..."
+docker system prune -a -f
+
 # 실행 중인 동일한 이름의 컨테이너가 있는지 확인
 if [ $(sudo docker ps -q -f ancestor=${CONTAINER_NAME}) ]; then
 	echo "qwejioqwjeoiqwejoiqwej"
