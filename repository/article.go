@@ -67,15 +67,19 @@ func (repo *articleRepository) CreateWithTransaction(db *gorm.DB, requestDTO art
 
 func (repo *articleRepository) GetByID(db *gorm.DB, articleID, userID int64) (*models.Article, error) {
 
-	var article models.Article
+	article := models.Article{
+		ID: articleID,
+	}
 
-	err := db.Model(article).
+	query := db.Debug().Model(article).
 		Preload("User").
-		Preload("Likes").
-		Preload("Tags").
-		First(&article, &models.Article{
-			ID: articleID,
-		}).Error
+		Preload("Tags")
+
+	if userID > 0 {
+		query.Preload("Likes", "user_id = ?", userID)
+	}
+
+	err := query.First(&article).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
@@ -86,19 +90,21 @@ func (repo *articleRepository) GetByID(db *gorm.DB, articleID, userID int64) (*m
 	return &article, nil
 }
 
-func (repo *articleRepository) GetByOffset(db *gorm.DB, offset, limit int) ([]models.Article, error) {
+func (repo *articleRepository) GetByOffset(db *gorm.DB, offset, limit int, userID int64) ([]models.Article, error) {
 
 	var articles []models.Article
 
 	// id로 내림차순
-	err := db.Model(&articles).
+	query := db.Debug().Model(&articles).
 		Preload("User").
-		Preload("Likes").
 		Preload("Tags").
-		Order("id desc").
-		Offset(offset).
-		Limit(limit).
-		Find(&articles).Error
+		Order("id desc")
+
+	if userID > 0 {
+		query.Preload("Likes", "user_id = ?", userID)
+	}
+
+	err := query.Offset(offset).Limit(limit).Find(&articles).Error
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +116,7 @@ func (repo *articleRepository) GetByOffsetAndTag(db *gorm.DB, offset, limit int,
 
 	var articles []models.Article
 
-	query := db.Model(&articles).
+	query := db.Debug().Model(&articles).
 		Preload("User").
 		Preload("Likes").
 		Preload("Tags").
@@ -126,7 +132,7 @@ func (repo *articleRepository) GetByOffsetAndTag(db *gorm.DB, offset, limit int,
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return articles, nil
 }
 

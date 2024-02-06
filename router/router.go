@@ -93,7 +93,7 @@ var ArticleRouter = [][]*Route{
 			Method:      "GET",
 			Path:        "/user/{user_id}/article/{article_id}",
 			HandlerFunc: article.ReadArticleByID,
-			Middleware:  []Middleware{UserAuthMiddleware},
+			Middleware:  []Middleware{UserAuthMiddlewareWithoutVerify},
 		},
 		{
 			Method:      "PUT",
@@ -111,6 +111,7 @@ var ArticleRouter = [][]*Route{
 			Method:      "GET",
 			Path:        "/articles",
 			HandlerFunc: article.ReadArticleByOffset,
+			Middleware:  []Middleware{UserAuthMiddlewareWithoutVerify},
 		},
 		{
 			Method:      "GET",
@@ -122,6 +123,12 @@ var ArticleRouter = [][]*Route{
 			Method:      "GET",
 			Path:        "/articles/tag",
 			HandlerFunc: article.ReadArticleByTag,
+		},
+		{
+			Method:      "POST",
+			Path:        "/user/{user_id}/article/{article_id}/like",
+			HandlerFunc: article.CreateArticleLike,
+			Middleware:  []Middleware{UserAuthMiddleware},
 		},
 	},
 }
@@ -285,25 +292,26 @@ func UserAuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func testMiddlewareA(next http.HandlerFunc) http.HandlerFunc {
+// 토큰이 없어도 인증 검사를 하지 않음
+
+func UserAuthMiddlewareWithoutVerify(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("a")
 
-		next(w, r)
-	}
-}
+		var userID int64
+		token := r.Header.Get("Authorization")
+		if token != "" {
+			parsedToken, err := jwt.ParseWithClaims(token, &types.JWTClaims{}, func(token *jwt.Token) (interface{}, error) {
+				return []byte(env.Config.Auth.Secret), nil
+			})
+			if err == nil {
+				if claim, ok := parsedToken.Claims.(*types.JWTClaims); ok && parsedToken.Valid {
+					userID = claim.UserID
+				}
+			}
+		}
 
-func testMiddlewareB(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("b")
-		next(w, r)
-	}
+		ctx := context.WithValue(r.Context(), "ctx_user_id", userID)
 
-}
-
-func testMiddlewareC(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("c")
-		next(w, r)
+		next(w, r.WithContext(ctx))
 	}
 }
