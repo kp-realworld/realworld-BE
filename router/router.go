@@ -112,6 +112,17 @@ var ArticleRouter = [][]*Route{
 			Path:        "/articles",
 			HandlerFunc: article.ReadArticleByOffset,
 		},
+		{
+			Method:      "GET",
+			Path:        "/user/{user_id}/articles",
+			HandlerFunc: article.ReadMyArticleByOffset,
+			Middleware:  []Middleware{UserAuthMiddleware},
+		},
+		{
+			Method:      "GET",
+			Path:        "/articles/tag",
+			HandlerFunc: article.ReadArticleByTag,
+		},
 	},
 }
 

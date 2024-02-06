@@ -76,3 +76,7 @@ type UpdateArticleResponseDTO struct {
 type UpdateArticleResponseWrapperDTO struct {
 	Article UpdateArticleResponseDTO `json:"article"`
 }
+
+type ReadMyArticlesResponseWrapperDTO struct {
+	Articles []ReadArticleResponseDTO `json:"articles"`
+}

@@ -17,7 +17,7 @@ type Article struct {
 	User          User
 	Comments      []Comment
 	Tags          []ArticleTag
-	Likes         []ArticleLike  `gorm:"foreignkey:ArticleID;"`
+	Likes         []ArticleLike
 	CreatedAt     time.Time      `gorm:"type:datetime; not null; default:CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt     *time.Time     `gorm:"type:datetime; null; default:null" json:"updated_at"`
 	DeletedAt     gorm.DeletedAt `gorm:"index"`
