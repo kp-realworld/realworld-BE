@@ -60,6 +60,7 @@ func CreateArticle(w http.ResponseWriter, r *http.Request) {
 // @Tags Article tag
 // @Accept json
 // @Produce json
+// @Param authorization header string false "로그인 한 경우, 토큰 전달(토큰이 없는 경우(로그아웃) 에러가 발생하지 않음)"
 // @Param user_id path int true "article author id(기사 소유자)"
 // @Param article_id path int true "article id(기사 ID)"
 // @Success 200 {object} articledto.ReadArticleResponseWrapperDTO "success"
@@ -69,19 +70,15 @@ func CreateArticle(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} types.ErrorResponse "네트워크 에러"
 // @Router /user/{user_id}/article/{article_id} [get]
 func ReadArticleByID(w http.ResponseWriter, r *http.Request) {
+	ctxUserID := r.Context().Value("ctx_user_id").(int64)
 
-	userID, err := util.GetIntegerParam[int64](r, "user_id")
-	if err != nil {
-		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
-		return
-	}
 	articleID, err := util.GetIntegerParam[int64](r, "article_id")
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	article, err := repository.ArticleRepo.GetByID(repository.DB, articleID, userID)
+	article, err := repository.ArticleRepo.GetByID(repository.DB, articleID, ctxUserID)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
@@ -98,6 +95,7 @@ func ReadArticleByID(w http.ResponseWriter, r *http.Request) {
 // @Tags Article tag
 // @Accept json
 // @Produce json
+// @Param authorization header string false "로그인 한 경우, 토큰 전달(토큰이 없는 경우(로그아웃) 에러가 발생하지 않음)"
 // @Param page header int false "page"
 // @Param limit header int false "limit"
 // @Success 200 {object} articledto.ReadArticleByOffsetResponseWrapperDTO "success"
@@ -107,13 +105,14 @@ func ReadArticleByID(w http.ResponseWriter, r *http.Request) {
 // @Router /articles [get]
 func ReadArticleByOffset(w http.ResponseWriter, r *http.Request) {
 
+	ctxUserID := r.Context().Value("ctx_user_id").(int64)
 	page, limit, err := util.GetOffsetAndLimit(r)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	articles, err := repository.ArticleRepo.GetByOffset(repository.DB, page, limit)
+	articles, err := repository.ArticleRepo.GetByOffset(repository.DB, page, limit, ctxUserID)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
@@ -274,4 +273,57 @@ func ReadArticleByTag(w http.ResponseWriter, r *http.Request) {
 	}
 
 	responder.ReadArticleByOffsetResponse(w, articles)
+}
+
+// @Summary Article like
+// @Description Article like
+// @Tags Article tag
+// @Accept json
+// @Produce json
+// @Param authorization header string true "jwt token"
+// @Param user_id path int true "article 작성자 ID"
+// @Param article_id path int true "article id"
+// @Success 200 "success"
+// @Failure 400 {object} types.ErrorResponse "user_id, article id가 유효하지 않음"
+// @Failure 404 {object} types.ErrorResponse "기사를 찾지 못한 경우"
+// @Failure 422 {object} types.ErrorResponse "요청을 제대로 수행하지 못하거나"
+// @Failure 500 {object} types.ErrorResponse "network error"
+// @Router /user/{user_id}/article/{article_id}/like [post]
+func CreateArticleLike(w http.ResponseWriter, r *http.Request) {
+	ctxUserID := r.Context().Value("ctx_user_id").(int64)
+
+	userID, err := util.GetIntegerParam[int64](r, "user_id")
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	articleID, err := util.GetIntegerParam[int64](r, "article_id")
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	err = repository.ArticleRepo.ValidateArticleOwner(repository.DB, articleID, userID)
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusNotFound, "article not found")
+		return
+	}
+
+	err = repository.ArticleLikeRepo.Create(repository.DB, articleID, ctxUserID)
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	article, err := repository.ArticleRepo.GetByID(repository.DB, articleID, ctxUserID)
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	} else if article == nil {
+		responder.ErrorResponse(w, http.StatusNotFound, "article not found")
+		return
+	}
+
+	responder.CreateArticleLikeResponse(w, *article)
 }
