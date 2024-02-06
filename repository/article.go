@@ -105,6 +105,44 @@ func (repo *articleRepository) GetByOffset(db *gorm.DB, offset, limit int) ([]mo
 	return articles, nil
 }
 
+func (repo *articleRepository) GetByOffsetAndTag(db *gorm.DB, offset, limit int, tag string) ([]models.Article, error) {
+
+	var articles []models.Article
+
+	query := db.Model(&articles).
+		Preload("User").
+		Preload("Likes").
+		Preload("Tags").
+		Order("id desc")
+
+	if tag != "" {
+		query = query.Joins()
+	}
+
+	return articles, nil
+}
+
+func (repo *articleRepository) GetByUserAndOffset(db *gorm.DB, offset, limit int, userID int64) ([]models.Article, error) {
+
+	var articles []models.Article
+
+	// id로 내림차순
+	err := db.Model(&articles).
+		Preload("User").
+		Preload("Likes").
+		Preload("Tags").
+		Where("user_id = ?", userID).
+		Order("id desc").
+		Offset(offset).
+		Limit(limit).
+		Find(&articles).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return articles, nil
+}
+
 func (repo *articleRepository) UpdateByID(db *gorm.DB, requestDTO articledto.UpdateArticleRequestDTO, articleID, userID int64) (*models.Article, error) {
 
 	article := models.Article{

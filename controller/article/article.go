@@ -193,6 +193,7 @@ func DeleteArticle(w http.ResponseWriter, r *http.Request) {
 		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
+
 	articleID, err := util.GetIntegerParam[int64](r, "article_id")
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -206,4 +207,40 @@ func DeleteArticle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
+}
+
+// @Summary Read my article by offset
+// @Description page, limit을 이용해서 내가 작성한 article을 읽어옴(limit는 없는 경우 10으로 사용)
+// @Tags Article tag
+// @Accept json
+// @Produce json
+// @Param authorization header string true "jwt token"
+// @Param user_id path int true "내 user ID"
+// @Param page header int false "page"
+// @Param limit header int false "limit"
+// @Success 200 {object} articledto.ReadArticleByOffsetResponseWrapperDTO "success"
+// @Failure 400 {object} types.ErrorResponse "입력값이 유효하지 않음"
+// @Failure 422 {object} types.ErrorResponse "요청을 제대로 수행하지 못함"
+// @Failure 500 {object} types.ErrorResponse "네트워크 에러"
+// @Router /user/{user_id}/articles [get]
+func ReadMyArticleByOffset(w http.ResponseWriter, r *http.Request) {
+	userID, err := util.GetIntegerParam[int64](r, "user_id")
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	page, limit, err := util.GetOffsetAndLimit(r)
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	articles, err := repository.ArticleRepo.GetByUserAndOffset(repository.DB, page, limit, userID)
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	responder.ReadArticleByOffsetResponse(w, articles)
 }
