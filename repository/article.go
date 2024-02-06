@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+
 	"gorm.io/gorm"
 
 	articledto "github.com/hotkimho/realworld-api/controller/dto/article"
@@ -115,10 +116,17 @@ func (repo *articleRepository) GetByOffsetAndTag(db *gorm.DB, offset, limit int,
 		Preload("Tags").
 		Order("id desc")
 
+	// tag 값이 있으면 tag만 데이터를 가져옴
 	if tag != "" {
-		query = query.Joins()
+		query = query.Joins("LEFT JOIN article_tags ON articles.id = article_tags.article_id").
+			Where("article_tags.tag = ?", tag)
 	}
 
+	err := query.Offset(offset).Limit(limit).Find(&articles).Error
+	if err != nil {
+		return nil, err
+	}
+	
 	return articles, nil
 }
 

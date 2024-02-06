@@ -18,8 +18,7 @@ func IssueJWT(userID int64) (string, error) {
 	}
 
 	now := time.Now().In(env.Seoul)
-	//ExpiredTime := now.Add(time.Hour * time.Duration(env.Config.Auth.AccessTokenExpire))
-	ExpiredTime := now.Add(time.Minute * 1)
+	ExpiredTime := now.Add(time.Hour * time.Duration(env.Config.Auth.AccessTokenExpire))
 	claims := types.JWTClaims{
 		userID,
 		jwt.RegisteredClaims{

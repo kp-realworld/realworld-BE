@@ -244,3 +244,34 @@ func ReadMyArticleByOffset(w http.ResponseWriter, r *http.Request) {
 
 	responder.ReadArticleByOffsetResponse(w, articles)
 }
+
+// @Summary Read article by tag
+// @Description tag를 이용해서 article을 읽어옴
+// @Tags Article tag
+// @Accept json
+// @Produce json
+// @Param tag query string true "tag"
+// @Param page header int false "page"
+// @Param limit header int false "limit"
+// @Success 200 {object} articledto.ReadArticleByOffsetResponseWrapperDTO "success"
+// @Failure 400 {object} types.ErrorResponse "입력값이 유효하지 않음"
+// @Failure 422 {object} types.ErrorResponse "요청을 제대로 수행하지 못함"
+// @Failure 500 {object} types.ErrorResponse "네트워크 에러"
+// @Router /articles/tag [get]
+func ReadArticleByTag(w http.ResponseWriter, r *http.Request) {
+	tag := r.URL.Query().Get("tag")
+
+	page, limit, err := util.GetOffsetAndLimit(r)
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	articles, err := repository.ArticleRepo.GetByOffsetAndTag(repository.DB, page, limit, tag)
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	responder.ReadArticleByOffsetResponse(w, articles)
+}

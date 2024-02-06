@@ -105,6 +105,8 @@ func ReadArticleByOffsetResponse(w http.ResponseWriter, articles []models.Articl
 			FavoriteCount: article.FavoriteCount,
 			IsFavorited:   isLiked,
 			TagList:       tagList,
+			CreatedAt:     article.CreatedAt,
+			UpdatedAt:     article.UpdatedAt,
 			Author: articledto.ArticleAuthor{
 				Username:     article.User.Username,
 				Bio:          article.User.Bio,
