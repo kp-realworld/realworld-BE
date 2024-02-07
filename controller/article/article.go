@@ -249,6 +249,7 @@ func ReadMyArticleByOffset(w http.ResponseWriter, r *http.Request) {
 // @Tags Article tag
 // @Accept json
 // @Produce json
+// @Param authorization header string false "로그인 한 경우, 토큰 전달(토큰이 없는 경우(로그아웃) 에러가 발생하지 않음)"
 // @Param tag query string true "tag"
 // @Param page header int false "page"
 // @Param limit header int false "limit"
