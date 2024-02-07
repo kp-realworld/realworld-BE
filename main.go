@@ -3,14 +3,16 @@ package main
 import (
 	"flag"
 	"fmt"
+	//_ "github.com/swaggo/http-swagger/example/gorilla/docs"
+	"net/http"
+
+	"github.com/getsentry/sentry-go"
+	"github.com/sirupsen/logrus"
+
 	_ "github.com/hotkimho/realworld-api/docs"
 	"github.com/hotkimho/realworld-api/env"
 	"github.com/hotkimho/realworld-api/repository"
 	"github.com/hotkimho/realworld-api/router"
-	"github.com/sirupsen/logrus"
-
-	//_ "github.com/swaggo/http-swagger/example/gorilla/docs"
-	"net/http"
 )
 
 // @title Swagger Example API
@@ -43,6 +45,16 @@ func main() {
 	}
 
 	if err := repository.Init(); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	err := sentry.Init(sentry.ClientOptions{
+		Dsn:              "https://2355f663979b763e68d7f34270bc8eb8@o4506706740641792.ingest.sentry.io/4506706742673408",
+		EnableTracing:    true,
+		TracesSampleRate: 1.0,
+	})
+	if err != nil {
 		fmt.Println(err)
 		return
 	}

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/sirupsen/logrus"
 
 	authdto "github.com/hotkimho/realworld-api/controller/dto/auth"
 	"github.com/hotkimho/realworld-api/env"
@@ -16,6 +17,7 @@ import (
 )
 
 func Heartbeat(w http.ResponseWriter, r *http.Request) {
+	logrus.Trace("heartbeat")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))
 }
@@ -193,6 +195,7 @@ func VerifyUsername(w http.ResponseWriter, r *http.Request) {
 	user, err := repository.UserRepo.GetByUsername(repository.DB, verifyReq.Username)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
+
 		return
 	} else if user != nil {
 		responder.ErrorResponse(w, http.StatusConflict, "already username")
