@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
@@ -22,12 +23,21 @@ import (
 )
 
 type Router struct {
-	Server     *mux.Router
-	CorsHandle *cors.Cors
+	Server        *mux.Router
+	CorsHandle    *cors.Cors
+	SentryHandler *sentryhttp.Handler
 }
 
 func (m *Router) Init() {
 	m.Server = mux.NewRouter()
+	m.SentryHandler = sentryhttp.New(sentryhttp.Options{})
+	//
+	//m.Server.HandleFunc("/foo", sentryHandler.HandleFunc(func(w http.ResponseWriter, r *http.Request) {
+	//	var aa *string
+	//	println(aa)
+	//	w.Header().Set("Content-Type", "application/json")
+	//	w.WriteHeader(http.StatusInternalServerError)
+	//}))
 
 	m.InitSwagger()
 	m.InitCORS()
@@ -172,7 +182,7 @@ func (m *Router) AddRoute(routeMaps [][]*Route) {
 				handler = route.Middleware[i](handler)
 			}
 
-			m.Server.Handle(route.Path, handler).Methods(route.Method)
+			m.Server.Handle(route.Path, m.SentryHandler.Handle(handler)).Methods(route.Method)
 		}
 	}
 }
