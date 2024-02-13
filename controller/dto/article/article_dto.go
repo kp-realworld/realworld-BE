@@ -14,6 +14,7 @@ type ArticleAuthor struct {
 	Username     string  `json:"username"`
 	Bio          *string `json:"bio,omitempty"`
 	ProfileImage string  `json:"profile_image"`
+	Following    *bool   `json:"following,omitempty"`
 }
 
 type CreateArticleResponseDTO struct {
@@ -61,16 +62,16 @@ type UpdateArticleRequestDTO struct {
 }
 
 type UpdateArticleResponseDTO struct {
-	ID            int64  `json:"article_id"`
-	Title         string `json:"title"`
-	Description   string `json:"description"`
-	Body          string `json:"body"`
-	FavoriteCount int    `json:"favorite_count"`
-	//TagList       []string      `json:"tag_list"`
-	//IsFavorited   bool          `json:"is_favorited"`
-	//Author        ArticleAuthor `json:"author"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt *time.Time `json:"updated_at,omitempty"`
+	ID            int64         `json:"article_id"`
+	Title         string        `json:"title"`
+	Description   string        `json:"description"`
+	Body          string        `json:"body"`
+	FavoriteCount int           `json:"favorite_count"`
+	TagList       []string      `json:"tag_list,omitempty"`
+	IsFavorited   bool          `json:"is_favorited"`
+	Author        ArticleAuthor `json:"author"`
+	CreatedAt     time.Time     `json:"created_at"`
+	UpdatedAt     *time.Time    `json:"updated_at,omitempty"`
 }
 
 type UpdateArticleResponseWrapperDTO struct {

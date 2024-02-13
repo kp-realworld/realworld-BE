@@ -16,7 +16,18 @@ type User struct {
 	Articles      []Article
 	LikedArticles []Article // `gorm:"many2many:article_likes;"`
 	Comments      []Comment
+	Followers     []User         `gorm:"many2many:user_followers;joinForeignKey:FolloweeID;joinReferences:FollowerID" json:"followers"`
+	Followees     []User         `gorm:"many2many:user_followers;joinForeignKey:FollowerID;joinReferences:FolloweeID" json:"followees"`
 	CreatedAt     time.Time      `gorm:"type:datetime; not null; default:CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt     *time.Time     `gorm:"type:datetime; null; default:null" json:"updated_at"`
 	DeletedAt     gorm.DeletedAt `gorm:"index"`
+}
+
+type Follow struct {
+	ID         int64          `gorm:"primary_key" json:"id"`
+	FollowerID int64          `gorm:"not null;" json:"follower_id"`
+	FolloweeID int64          `gorm:"not null;" json:"followee_id"`
+	CreatedAt  time.Time      `gorm:"type:datetime; not null; default:CURRENT_TIMESTAMP" json:"created_at"`
+	UpdatedAt  *time.Time     `gorm:"type:datetime; null; default:null" json:"updated_at"`
+	DeletedAt  gorm.DeletedAt `gorm:"index"`
 }

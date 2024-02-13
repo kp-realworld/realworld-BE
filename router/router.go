@@ -3,6 +3,7 @@ package router
 import (
 	"context"
 	"fmt"
+	"github.com/hotkimho/realworld-api/controller/follow"
 	"net/http"
 	"strings"
 
@@ -43,6 +44,7 @@ func (m *Router) Init() {
 	m.InitCORS()
 	m.AddRoute(ArticleRouter)
 	m.AddRoute(CommentRouter)
+	m.AddRoute(FollowRouter)
 	m.AddRoute([][]*Route{
 		{
 			{
@@ -140,6 +142,12 @@ var ArticleRouter = [][]*Route{
 			HandlerFunc: article.CreateArticleLike,
 			Middleware:  []Middleware{UserAuthMiddleware},
 		},
+		{
+			Method:      "DELETE",
+			Path:        "/user/{user_id}/article/{article_id}/like",
+			HandlerFunc: article.DeleteArticleLike,
+			Middleware:  []Middleware{UserAuthMiddleware},
+		},
 	},
 }
 
@@ -166,6 +174,23 @@ var CommentRouter = [][]*Route{
 			Method:      "DELETE",
 			Path:        "/user/{user_id}/article/{article_id}/comment/{comment_id}",
 			HandlerFunc: comment.DeleteComment,
+			Middleware:  []Middleware{UserAuthMiddleware},
+		},
+	},
+}
+
+var FollowRouter = [][]*Route{
+	{
+		{
+			Method:      "POST",
+			Path:        "/user/follow/{followed_id}",
+			HandlerFunc: follow.CreateFollow,
+			Middleware:  []Middleware{UserAuthMiddleware},
+		},
+		{
+			Method:      "DELETE",
+			Path:        "/user/follow/{followed_id}",
+			HandlerFunc: follow.DeleteFollow,
 			Middleware:  []Middleware{UserAuthMiddleware},
 		},
 	},

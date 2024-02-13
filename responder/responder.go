@@ -3,9 +3,9 @@ package responder
 import (
 	"encoding/json"
 	"errors"
+	"github.com/getsentry/sentry-go"
 	"net/http"
 
-	"github.com/getsentry/sentry-go"
 	"github.com/sirupsen/logrus"
 
 	"github.com/hotkimho/realworld-api/types"
@@ -21,6 +21,7 @@ func ErrorResponse(w http.ResponseWriter, statusCode int, message string) {
 		logrus.Error(message)
 		sentry.CaptureException(errors.New(message))
 	}
+
 	err := json.NewEncoder(w).Encode(errorResponse)
 	if err != nil {
 		logrus.Error(err)

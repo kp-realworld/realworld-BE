@@ -17,6 +17,7 @@ var ArticleRepo *articleRepository
 var ArticleTagRepo *articleTagRepository
 var ArticleLikeRepo *articleLikeRepository
 var CommentRepo *commentRepository
+var FollowRepo *followRepository
 
 func Init() error {
 
@@ -41,7 +42,14 @@ func Init() error {
 	// Init Repositories
 	initRepositories()
 	// models.Article{}, models.ArticleTag{}, models.ArticleLike{}
-	err = DB.AutoMigrate(models.User{}, models.Article{}, models.ArticleTag{}, models.ArticleLike{}, models.Comment{})
+	err = DB.AutoMigrate(
+		models.User{},
+		models.Article{},
+		models.ArticleTag{},
+		models.ArticleLike{},
+		models.Comment{},
+		models.Follow{},
+	)
 	if err != nil {
 		return err
 	}
@@ -59,4 +67,5 @@ func initRepositories() {
 	ArticleTagRepo = NewArticleTagRepository()
 	ArticleLikeRepo = NewArticleLikeRepository()
 	CommentRepo = NewCommentRepository()
+	FollowRepo = NewFollowRepository()
 }
