@@ -2,6 +2,7 @@ package article
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/hotkimho/realworld-api/controller/dto/article"
@@ -72,6 +73,12 @@ func CreateArticle(w http.ResponseWriter, r *http.Request) {
 func ReadArticleByID(w http.ResponseWriter, r *http.Request) {
 	ctxUserID := r.Context().Value("ctx_user_id").(int64)
 
+	userID, err := util.GetIntegerParam[int64](r, "user_id")
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
 	articleID, err := util.GetIntegerParam[int64](r, "article_id")
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -87,7 +94,15 @@ func ReadArticleByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responder.ReadArticleByIDResponse(w, *article)
+	fmt.Println("userID: ", userID, "ctxUserID: ", ctxUserID)
+	// 팔로우 여부 확인(로그인한 경우에만)
+	isFollowing, err := repository.FollowRepo.IsFollowing(repository.DB, ctxUserID, userID)
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	fmt.Println(isFollowing)
+	responder.ReadArticleByIDResponse(w, *article, isFollowing)
 }
 
 // @Summary Read article by offset
@@ -284,10 +299,10 @@ func ReadArticleByTag(w http.ResponseWriter, r *http.Request) {
 // @Param authorization header string true "jwt token"
 // @Param user_id path int true "article 작성자 ID"
 // @Param article_id path int true "article id"
-// @Success 200 "success"
+// @Success 200 {object} articledto.CreateArticleLikeResponseDTO "이미 좋아요한 경우(좋아요 처리)"
+// @Success 201 {object} articledto.CreateArticleLikeResponseDTO "좋아요 성공 "
 // @Failure 400 {object} types.ErrorResponse "user_id, article id가 유효하지 않음"
 // @Failure 404 {object} types.ErrorResponse "기사를 찾지 못한 경우"
-// @Failure 422 {object} types.ErrorResponse "요청을 제대로 수행하지 못하거나"
 // @Failure 500 {object} types.ErrorResponse "network error"
 // @Router /user/{user_id}/article/{article_id}/like [post]
 func CreateArticleLike(w http.ResponseWriter, r *http.Request) {
@@ -311,10 +326,19 @@ func CreateArticleLike(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = repository.ArticleLikeRepo.Create(repository.DB, articleID, ctxUserID)
+	// 이미 좋아요를 눌렀는지 확인
+	like, err := repository.ArticleLikeRepo.IsLiked(repository.DB, articleID, ctxUserID)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
+	}
+
+	if !like {
+		err = repository.ArticleLikeRepo.Create(repository.DB, articleID, ctxUserID)
+		if err != nil {
+			responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
 	}
 
 	article, err := repository.ArticleRepo.GetByID(repository.DB, articleID, ctxUserID)
@@ -326,5 +350,52 @@ func CreateArticleLike(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responder.CreateArticleLikeResponse(w, *article)
+	if like {
+		responder.CreateArticleLikeResponse(w, http.StatusOK, *article)
+	} else {
+		responder.CreateArticleLikeResponse(w, http.StatusCreated, *article)
+	}
+}
+
+// @Summary Article unlike
+// @Description Article unlike
+// @Tags Article tag
+// @Accept json
+// @Produce json
+// @Param authorization header string true "jwt token"
+// @Param user_id path int true "article 작성자 ID"
+// @Param article_id path int true "article id"
+// @Success 204 "success"
+// @Failure 400 {object} types.ErrorResponse "user_id, article id가 유효하지 않음"
+// @Failure 404 {object} types.ErrorResponse "기사를 찾지 못한 경우"
+// @Failure 500 {object} types.ErrorResponse "network error"
+// @Router /user/{user_id}/article/{article_id}/like [delete]
+func DeleteArticleLike(w http.ResponseWriter, r *http.Request) {
+	ctxUserID := r.Context().Value("ctx_user_id").(int64)
+
+	userID, err := util.GetIntegerParam[int64](r, "user_id")
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	articleID, err := util.GetIntegerParam[int64](r, "article_id")
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	err = repository.ArticleRepo.ValidateArticleOwner(repository.DB, articleID, userID)
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusNotFound, "article not found")
+		return
+	}
+
+	err = repository.ArticleLikeRepo.Delete(repository.DB, articleID, ctxUserID)
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }

@@ -4,6 +4,7 @@ type ReadUserProfileResponseDTO struct {
 	Username     string  `json:"username"`
 	Bio          *string `json:"bio,omitempty"`
 	ProfileImage string  `json:"profile_image"`
+	Following    *bool   `json:"following"`
 }
 
 type ReadUserProfileResponseWrapperDTO struct {

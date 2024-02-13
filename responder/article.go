@@ -40,7 +40,7 @@ func CreateArticleResponse(w http.ResponseWriter, article models.Article, tagLis
 	w.Write(jsonData)
 }
 
-func ReadArticleByIDResponse(w http.ResponseWriter, article models.Article) {
+func ReadArticleByIDResponse(w http.ResponseWriter, article models.Article, isFollowed bool) {
 
 	isLiked := false
 	if len(article.Likes) > 0 {
@@ -68,6 +68,7 @@ func ReadArticleByIDResponse(w http.ResponseWriter, article models.Article) {
 				Bio:          article.User.Bio,
 				ProfileImage: article.User.ProfileImage,
 				AuthorID:     article.User.UserID,
+				Following:    &isFollowed,
 			},
 		},
 	}
@@ -135,15 +136,28 @@ func ReadArticleByOffsetResponse(w http.ResponseWriter, articles []models.Articl
 
 func UpdateArticleResponse(w http.ResponseWriter, article models.Article, tagList []string) {
 
+	isLiked := false
+	if len(article.Likes) > 0 {
+		isLiked = true
+	}
+
 	wrapper := articledto.UpdateArticleResponseWrapperDTO{
 		Article: articledto.UpdateArticleResponseDTO{
 			ID:            article.ID,
 			Title:         article.Title,
-			Description:   article.Description,
+			Description:   article.Body,
 			Body:          article.Body,
 			FavoriteCount: article.FavoriteCount,
+			IsFavorited:   isLiked,
+			TagList:       tagList,
 			CreatedAt:     article.CreatedAt,
 			UpdatedAt:     article.UpdatedAt,
+			Author: articledto.ArticleAuthor{
+				Username:     article.User.Username,
+				Bio:          article.User.Bio,
+				ProfileImage: article.User.ProfileImage,
+				AuthorID:     article.User.UserID,
+			},
 		},
 	}
 
@@ -158,7 +172,7 @@ func UpdateArticleResponse(w http.ResponseWriter, article models.Article, tagLis
 	w.Write(jsonData)
 }
 
-func CreateArticleLikeResponse(w http.ResponseWriter, article models.Article) {
+func CreateArticleLikeResponse(w http.ResponseWriter, code int, article models.Article) {
 
 	isLiked := false
 	if len(article.Likes) > 0 {
@@ -196,6 +210,6 @@ func CreateArticleLikeResponse(w http.ResponseWriter, article models.Article) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(code)
 	w.Write(jsonData)
 }
