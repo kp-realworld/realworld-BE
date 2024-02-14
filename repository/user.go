@@ -48,7 +48,7 @@ func (repo *userRepository) GetByUsername(db *gorm.DB, username string) (*models
 
 	var user models.User
 
-	err := db.Where(&models.User{Email: username}).First(&user).Error
+	err := db.Where(&models.User{Username: username}).First(&user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
