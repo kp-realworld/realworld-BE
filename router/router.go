@@ -64,9 +64,15 @@ func (m *Router) Init() {
 			},
 			{
 				Method:      "GET",
+				Path:        "/my/profile",
+				HandlerFunc: user.ReadMyProfile,
+				Middleware:  []Middleware{UserAuthMiddleware},
+			},
+			{
+				Method:      "GET",
 				Path:        "/user/{user_id}/profile",
 				HandlerFunc: user.ReadUserProfile,
-				Middleware:  []Middleware{UserAuthMiddleware},
+				Middleware:  []Middleware{UserAuthMiddlewareWithoutVerify},
 			},
 			{
 				Method:      "PUT",

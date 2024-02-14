@@ -7,13 +7,35 @@ import (
 	"net/http"
 )
 
-func ReadUserProfileResponse(w http.ResponseWriter, user models.User) {
+func ReadMyProfileResponse(w http.ResponseWriter, user models.User) {
+
+	wrapper := userdto.ReadMyProfileResponseWrapperDTO{
+		User: userdto.ReadMyProfileResponseDTO{
+			Username:     user.Username,
+			Bio:          user.Bio,
+			ProfileImage: user.ProfileImage,
+		},
+	}
+
+	jsonData, err := json.Marshal(wrapper)
+	if err != nil {
+		ErrorResponse(w, http.StatusUnprocessableEntity, err.Error())
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonData)
+}
+
+func ReadUserProfileResponse(w http.ResponseWriter, user models.User, isFollowing bool) {
 
 	wrapper := userdto.ReadUserProfileResponseWrapperDTO{
 		User: userdto.ReadUserProfileResponseDTO{
 			Username:     user.Username,
 			Bio:          user.Bio,
 			ProfileImage: user.ProfileImage,
+			Following:    &isFollowing,
 		},
 	}
 

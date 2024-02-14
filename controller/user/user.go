@@ -13,6 +13,31 @@ import (
 	"github.com/hotkimho/realworld-api/responder"
 )
 
+// @Summary 내 프로필 조회
+// @Description 내 프로필 조회
+// @Tags Profile tag
+// @Accept json
+// @Produce json
+// @Param authorization header string true "jwt token"
+// @Success 200 {object} userdto.ReadMyProfileResponseDTO "success"
+// @Failure 404 {object} types.ErrorResponse "user 정보가 없는 경우"
+// @Failure 500 {object} types.ErrorResponse "network error"
+// @Router /my/profile [get]
+func ReadMyProfile(w http.ResponseWriter, r *http.Request) {
+	ctxUserID := r.Context().Value("ctx_user_id").(int64)
+
+	user, err := repository.UserRepo.GetByID(repository.DB, ctxUserID)
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	} else if user == nil {
+		responder.ErrorResponse(w, http.StatusNotFound, "user not found")
+		return
+	}
+
+	responder.ReadMyProfileResponse(w, *user)
+}
+
 // header에 authorization이 있어야 한다.
 // @Summary Read user profile
 // @Description Read user profile
@@ -27,7 +52,8 @@ import (
 // @Failure 500 {object} types.ErrorResponse "network error"
 // @Router /user/{user_id}/profile [get]
 func ReadUserProfile(w http.ResponseWriter, r *http.Request) {
-	// @Header authorization string true "jwt token"
+	ctxUserID := r.Context().Value("ctx_user_id").(int64)
+
 	vars := mux.Vars(r)
 	userID, err := strconv.ParseInt(vars["user_id"], 10, 64)
 	if err != nil {
@@ -48,7 +74,17 @@ func ReadUserProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responder.ReadUserProfileResponse(w, *user)
+	var isFollowed bool
+	if ctxUserID > 0 {
+		followed, err := repository.FollowRepo.IsFollowing(repository.DB, ctxUserID, userID)
+		if err != nil {
+			responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
+			return
+		}
+		isFollowed = followed
+	}
+
+	responder.ReadUserProfileResponse(w, *user, isFollowed)
 }
 
 // @Summary Update user profile

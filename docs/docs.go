@@ -334,6 +334,48 @@ const docTemplate = `{
             }
         },
         "/my/profile": {
+            "get": {
+                "description": "내 프로필 조회",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Profile tag"
+                ],
+                "summary": "내 프로필 조회",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/userdto.ReadMyProfileResponseDTO"
+                        }
+                    },
+                    "404": {
+                        "description": "user 정보가 없는 경우",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "network error",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "put": {
                 "description": "Update user profile",
                 "consumes": [
@@ -1835,7 +1877,7 @@ const docTemplate = `{
         "followdto.CreateFollowResponseWrapperDTO": {
             "type": "object",
             "properties": {
-                "profile": {
+                "user": {
                     "$ref": "#/definitions/followdto.CreateFollowResponseDTO"
                 }
             }
@@ -1860,7 +1902,7 @@ const docTemplate = `{
         "followdto.DeleteFollowResponseWrapperDTO": {
             "type": "object",
             "properties": {
-                "profile": {
+                "user": {
                     "$ref": "#/definitions/followdto.DeleteFollowResponseDTO"
                 }
             }
@@ -1881,6 +1923,20 @@ const docTemplate = `{
             "properties": {
                 "error": {
                     "$ref": "#/definitions/types.ErrorDetail"
+                }
+            }
+        },
+        "userdto.ReadMyProfileResponseDTO": {
+            "type": "object",
+            "properties": {
+                "bio": {
+                    "type": "string"
+                },
+                "profile_image": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         },
