@@ -70,13 +70,13 @@ func (m *Router) Init() {
 			},
 			{
 				Method:      "PUT",
-				Path:        "/user/{user_id}/profile",
+				Path:        "/my/profile",
 				HandlerFunc: user.UpdateUserProfile,
 				Middleware:  []Middleware{UserAuthMiddleware},
 			},
 			{
 				Method:      "GET",
-				Path:        "/user/{user_id}/token-refresh",
+				Path:        "/token-refresh",
 				HandlerFunc: auth.RefreshToken,
 			},
 			{
@@ -97,25 +97,25 @@ var ArticleRouter = [][]*Route{
 	{
 		{
 			Method:      "POST",
-			Path:        "/user/{user_id}/article",
+			Path:        "/article",
 			HandlerFunc: article.CreateArticle,
 			Middleware:  []Middleware{UserAuthMiddleware},
 		},
 		{
 			Method:      "GET",
-			Path:        "/user/{user_id}/article/{article_id}",
+			Path:        "/user/{author_id}/article/{article_id}",
 			HandlerFunc: article.ReadArticleByID,
 			Middleware:  []Middleware{UserAuthMiddlewareWithoutVerify},
 		},
 		{
 			Method:      "PUT",
-			Path:        "/user/{user_id}/article/{article_id}",
+			Path:        "/article/{article_id}",
 			HandlerFunc: article.UpdateArticle,
 			Middleware:  []Middleware{UserAuthMiddleware},
 		},
 		{
 			Method:      "DELETE",
-			Path:        "/user/{user_id}/article/{article_id}",
+			Path:        "/article/{article_id}",
 			HandlerFunc: article.DeleteArticle,
 			Middleware:  []Middleware{UserAuthMiddleware},
 		},
@@ -127,7 +127,7 @@ var ArticleRouter = [][]*Route{
 		},
 		{
 			Method:      "GET",
-			Path:        "/user/{user_id}/articles",
+			Path:        "/my/articles",
 			HandlerFunc: article.ReadMyArticleByOffset,
 			Middleware:  []Middleware{UserAuthMiddleware},
 		},
@@ -138,13 +138,13 @@ var ArticleRouter = [][]*Route{
 		},
 		{
 			Method:      "POST",
-			Path:        "/user/{user_id}/article/{article_id}/like",
+			Path:        "/user/{author_id}/article/{article_id}/like",
 			HandlerFunc: article.CreateArticleLike,
 			Middleware:  []Middleware{UserAuthMiddleware},
 		},
 		{
 			Method:      "DELETE",
-			Path:        "/user/{user_id}/article/{article_id}/like",
+			Path:        "/user/{author_id}/article/{article_id}/like",
 			HandlerFunc: article.DeleteArticleLike,
 			Middleware:  []Middleware{UserAuthMiddleware},
 		},
@@ -155,24 +155,24 @@ var CommentRouter = [][]*Route{
 	{
 		{
 			Method:      "POST",
-			Path:        "/user/{user_id}/article/{article_id}/comment",
+			Path:        "/user/{author_id}/article/{article_id}/comment",
 			HandlerFunc: comment.CreateComment,
 			Middleware:  []Middleware{UserAuthMiddleware},
 		},
 		{
 			Method:      "GET",
-			Path:        "/user/{user_id}/article/{article_id}/comments",
+			Path:        "/user/{author_id}/article/{article_id}/comments",
 			HandlerFunc: comment.ReadComments,
 		},
 		{
 			Method:      "PUT",
-			Path:        "/user/{user_id}/article/{article_id}/comment/{comment_id}",
+			Path:        "/user/{author_id}/article/{article_id}/comment/{comment_id}",
 			HandlerFunc: comment.UpdateComment,
 			Middleware:  []Middleware{UserAuthMiddleware},
 		},
 		{
 			Method:      "DELETE",
-			Path:        "/user/{user_id}/article/{article_id}/comment/{comment_id}",
+			Path:        "/user/{author_id}/article/{article_id}/comment/{comment_id}",
 			HandlerFunc: comment.DeleteComment,
 			Middleware:  []Middleware{UserAuthMiddleware},
 		},
@@ -296,9 +296,8 @@ func UserAuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 
 		var userID int64
 		if claim, ok := parsedToken.Claims.(*types.JWTClaims); ok && parsedToken.Valid {
-			// 토큰의 ID 와 요청의 ID 가 일치하는지 확인
 			if claim.UserID <= 0 {
-				responder.ErrorResponse(w, http.StatusBadRequest, "token is invalid")
+				responder.ErrorResponse(w, http.StatusUnauthorized, "token is invalid")
 				return
 			}
 			userID = claim.UserID
@@ -316,9 +315,13 @@ func UserAuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			//	return
 			//}
 		} else {
-			fmt.Println("err : ", err.Error())
 			responder.ErrorResponse(w, http.StatusUnauthorized, "token is invalid")
 			w.WriteHeader(401)
+			return
+		}
+
+		if userID <= 0 {
+			responder.ErrorResponse(w, http.StatusUnauthorized, "token is invalid")
 			return
 		}
 

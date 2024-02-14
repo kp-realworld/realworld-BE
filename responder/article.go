@@ -21,6 +21,7 @@ func CreateArticleResponse(w http.ResponseWriter, article models.Article, tagLis
 			IsFavorited:   false,
 			FavoriteCount: article.FavoriteCount,
 			Author: articledto.ArticleAuthor{
+				AuthorID:     article.UserID,
 				Username:     article.User.Username,
 				Bio:          article.User.Bio,
 				ProfileImage: article.User.ProfileImage,

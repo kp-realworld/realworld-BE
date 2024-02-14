@@ -24,6 +24,124 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/article/{article_id}": {
+            "put": {
+                "description": "Update article",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Article tag"
+                ],
+                "summary": "Update article",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "article id(기사 ID)",
+                        "name": "article_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "updateArticleReq",
+                        "name": "updateArticleReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/articledto.UpdateArticleRequestDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/articledto.UpdateArticleResponseWrapperDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "요청을 제대로 수행하지 못함",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "network error",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete article",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Article tag"
+                ],
+                "summary": "Delete article",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "article id(기사 ID)",
+                        "name": "article_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "success"
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "요청을 제대로 수행하지 못함",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "network error",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/articles": {
             "get": {
                 "description": "page, limit을 이용해서 article을 읽어옴(limit는 없는 경우 10으로 사용)",
@@ -48,13 +166,13 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "page",
                         "name": "page",
-                        "in": "header"
+                        "in": "query"
                     },
                     {
                         "type": "integer",
                         "description": "limit",
                         "name": "limit",
-                        "in": "header"
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -116,13 +234,13 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "page",
                         "name": "page",
-                        "in": "header"
+                        "in": "query"
                     },
                     {
                         "type": "integer",
                         "description": "limit",
                         "name": "limit",
-                        "in": "header"
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -146,6 +264,171 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "네트워크 에러",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/my/articles": {
+            "get": {
+                "description": "page, limit을 이용해서 내가 작성한 article을 읽어옴(limit는 없는 경우 10으로 사용)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Article tag"
+                ],
+                "summary": "Read my article by offset",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/articledto.ReadArticleByOffsetResponseWrapperDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "입력값이 유효하지 않음",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "요청을 제대로 수행하지 못함",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "네트워크 에러",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/my/profile": {
+            "put": {
+                "description": "Update user profile",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Profile tag"
+                ],
+                "summary": "Update user profile",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "updateUserProfileReq",
+                        "name": "updateUserProfileReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/userdto.UpdateUserProfileRequestDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/userdto.UpdateUserProfileResponseWrapperDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "요청을 제대로 수행하지 못함",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "network error",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/token-refresh": {
+            "get": {
+                "description": "토큰 갱신",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth tag"
+                ],
+                "summary": "토큰 갱신",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/authdto.RefreshTokenResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "토큰이 없는 경우",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "network error",
                         "schema": {
                             "$ref": "#/definitions/types.ErrorResponse"
                         }
@@ -473,66 +756,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/{user_id}/article": {
-            "post": {
-                "description": "기사를 생성합니다.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Article tag"
-                ],
-                "summary": "기사 생성",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "jwt token",
-                        "name": "authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "description": "기사 생성 내용",
-                        "name": "createArticleReq",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/articledto.CreateArticleRequestDTO"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "정상적으로 생성됨",
-                        "schema": {
-                            "$ref": "#/definitions/articledto.CreateArticleResponseWrapperDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "입력값이 유효하지 않음",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    },
-                    "422": {
-                        "description": "요청을 제대로 수행하지 못함",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "네트워크 에러",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/user/{user_id}/article/{article_id}": {
+        "/user/{author_id}/article/{article_id}": {
             "get": {
                 "description": "Read article by id",
                 "consumes": [
@@ -599,139 +823,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "put": {
-                "description": "Update article",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Article tag"
-                ],
-                "summary": "Update article",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "jwt token",
-                        "name": "authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "article author id(기사 소유자)",
-                        "name": "user_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "article id(기사 ID)",
-                        "name": "article_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "updateArticleReq",
-                        "name": "updateArticleReq",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/articledto.UpdateArticleRequestDTO"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "success",
-                        "schema": {
-                            "$ref": "#/definitions/articledto.UpdateArticleResponseWrapperDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "bad request",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    },
-                    "422": {
-                        "description": "요청을 제대로 수행하지 못함",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "network error",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Delete article",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Article tag"
-                ],
-                "summary": "Delete article",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "jwt token",
-                        "name": "authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "article author id(기사 소유자)",
-                        "name": "user_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "article id(기사 ID)",
-                        "name": "article_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "success"
-                    },
-                    "400": {
-                        "description": "bad request",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    },
-                    "422": {
-                        "description": "요청을 제대로 수행하지 못함",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "network error",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    }
-                }
             }
         },
-        "/user/{user_id}/article/{article_id}/comment": {
+        "/user/{author_id}/article/{article_id}/comment": {
             "post": {
                 "description": "댓글을 생성합니다.",
                 "consumes": [
@@ -755,7 +849,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "article author id(기사 소유자)",
-                        "name": "user_id",
+                        "name": "author_id",
                         "in": "path",
                         "required": true
                     },
@@ -804,6 +898,251 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/{author_id}/article/{article_id}/comment/{comment_id}": {
+            "delete": {
+                "description": "댓글을 삭제합니다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Comment tag"
+                ],
+                "summary": "댓글 삭제",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "article author id(기사 소유자)",
+                        "name": "author_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "article id(기사 ID)",
+                        "name": "article_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "comment id(댓글 ID)",
+                        "name": "comment_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "정상적으로 삭제됨",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "잘못된 값을 요청한 경우",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "네트워크 에러",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/{author_id}/article/{article_id}/comments": {
+            "get": {
+                "description": "기사의 댓글 목록을 조회합니다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Comment tag"
+                ],
+                "summary": "댓글 목록 조회",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "article author id(기사 소유자)",
+                        "name": "author_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "article id(기사 ID)",
+                        "name": "article_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/commentdto.ReadCommentsResponseWrapperDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "잘못된 값을 요청한 경우",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "네트워크 에러",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/{author_id}/article/{article_id}/like": {
+            "post": {
+                "description": "Article like",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Article tag"
+                ],
+                "summary": "Article like",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "article 작성자 ID",
+                        "name": "author_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "article id",
+                        "name": "article_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "이미 좋아요한 경우(좋아요 처리)",
+                        "schema": {
+                            "$ref": "#/definitions/articledto.CreateArticleLikeResponseDTO"
+                        }
+                    },
+                    "201": {
+                        "description": "좋아요 성공 ",
+                        "schema": {
+                            "$ref": "#/definitions/articledto.CreateArticleLikeResponseDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "user_id, article id가 유효하지 않음",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "기사를 찾지 못한 경우",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "network error",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/{user_id}/article": {
+            "post": {
+                "description": "기사를 생성합니다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Article tag"
+                ],
+                "summary": "기사 생성",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "기사 생성 내용",
+                        "name": "createArticleReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/articledto.CreateArticleRequestDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "정상적으로 생성됨",
+                        "schema": {
+                            "$ref": "#/definitions/articledto.CreateArticleResponseWrapperDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "입력값이 유효하지 않음",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "요청을 제대로 수행하지 못함",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "네트워크 에러",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/user/{user_id}/article/{article_id}/comment/{comment_id}": {
             "put": {
                 "description": "댓글을 수정합니다.",
@@ -828,7 +1167,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "article author id(기사 소유자)",
-                        "name": "user_id",
+                        "name": "author_id",
                         "in": "path",
                         "required": true
                     },
@@ -882,191 +1221,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "delete": {
-                "description": "댓글을 삭제합니다.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Comment tag"
-                ],
-                "summary": "댓글 삭제",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "jwt token",
-                        "name": "authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "article author id(기사 소유자)",
-                        "name": "user_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "article id(기사 ID)",
-                        "name": "article_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "comment id(댓글 ID)",
-                        "name": "comment_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "정상적으로 삭제됨",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "잘못된 값을 요청한 경우",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "네트워크 에러",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/user/{user_id}/article/{article_id}/comments": {
-            "get": {
-                "description": "기사의 댓글 목록을 조회합니다.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Comment tag"
-                ],
-                "summary": "댓글 목록 조회",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "article author id(기사 소유자)",
-                        "name": "user_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "article id(기사 ID)",
-                        "name": "article_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/commentdto.ReadCommentsResponseWrapperDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "잘못된 값을 요청한 경우",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "네트워크 에러",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    }
-                }
             }
         },
         "/user/{user_id}/article/{article_id}/like": {
-            "post": {
-                "description": "Article like",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Article tag"
-                ],
-                "summary": "Article like",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "jwt token",
-                        "name": "authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "article 작성자 ID",
-                        "name": "user_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "article id",
-                        "name": "article_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "이미 좋아요한 경우(좋아요 처리)",
-                        "schema": {
-                            "$ref": "#/definitions/articledto.CreateArticleLikeResponseDTO"
-                        }
-                    },
-                    "201": {
-                        "description": "좋아요 성공 ",
-                        "schema": {
-                            "$ref": "#/definitions/articledto.CreateArticleLikeResponseDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "user_id, article id가 유효하지 않음",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "기사를 찾지 못한 경우",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "network error",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    }
-                }
-            },
             "delete": {
                 "description": "Article unlike",
                 "consumes": [
@@ -1127,75 +1284,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/{user_id}/articles": {
-            "get": {
-                "description": "page, limit을 이용해서 내가 작성한 article을 읽어옴(limit는 없는 경우 10으로 사용)",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Article tag"
-                ],
-                "summary": "Read my article by offset",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "jwt token",
-                        "name": "authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "내 user ID",
-                        "name": "user_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page",
-                        "name": "page",
-                        "in": "header"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "limit",
-                        "name": "limit",
-                        "in": "header"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "success",
-                        "schema": {
-                            "$ref": "#/definitions/articledto.ReadArticleByOffsetResponseWrapperDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "입력값이 유효하지 않음",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    },
-                    "422": {
-                        "description": "요청을 제대로 수행하지 못함",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "네트워크 에러",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/user/{user_id}/profile": {
             "get": {
                 "description": "Read user profile",
@@ -1206,7 +1294,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "User tag"
+                    "Profile tag"
                 ],
                 "summary": "Read user profile",
                 "parameters": [
@@ -1240,114 +1328,6 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "user not found",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "network error",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "description": "Update user profile",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User tag"
-                ],
-                "summary": "Update user profile",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "user_id",
-                        "name": "user_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "jwt token",
-                        "name": "authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "description": "updateUserProfileReq",
-                        "name": "updateUserProfileReq",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/userdto.UpdateUserProfileRequestDTO"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "success",
-                        "schema": {
-                            "$ref": "#/definitions/userdto.UpdateUserProfileResponseWrapperDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "bad request",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    },
-                    "422": {
-                        "description": "요청을 제대로 수행하지 못함",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "network error",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/user/{user_id}/refresh": {
-            "get": {
-                "description": "토큰 갱신",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Auth tag"
-                ],
-                "summary": "토큰 갱신",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "jwt token",
-                        "name": "authorization",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "success",
-                        "schema": {
-                            "$ref": "#/definitions/authdto.RefreshTokenResponseDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "입력값이 유효하지 않음",
                         "schema": {
                             "$ref": "#/definitions/types.ErrorResponse"
                         }
