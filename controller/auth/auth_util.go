@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"encoding/json"
 	"github.com/hotkimho/realworld-api/controller/dto/auth"
 	"github.com/hotkimho/realworld-api/models"
 	"github.com/hotkimho/realworld-api/types"
@@ -25,22 +24,4 @@ func SignUpDTOToUser(requestDTO authdto.SignUpRequestDTO, hashedPassword string)
 		Password:     hashedPassword,
 		ProfileImage: types.DEFAULT_PROFILE_IMAGE_URL,
 	}
-}
-
-func UserToSignInResponseDTO(user models.User, token string) (string, error) {
-
-	wrapper := authdto.SignInResponseWrapperDTO{
-		User: authdto.SignInResponseDTO{
-			UserID:   user.UserID,
-			Username: user.Username,
-			Token:    token,
-		},
-	}
-
-	jsonData, err := json.Marshal(wrapper)
-	if err != nil {
-		return "", err
-	}
-
-	return string(jsonData), nil
 }

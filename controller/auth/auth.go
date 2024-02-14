@@ -107,13 +107,19 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := util.IssueJWT(user.UserID)
+	accessToken, err := util.IssueAccessJWT(user.UserID)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	responder.SignInResponse(w, *user, token)
+	refreshToken, err := util.IssueRefreshJWT(user.UserID)
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	responder.SignInResponse(w, *user, accessToken, refreshToken)
 }
 
 // @Summary 토큰 갱신
@@ -157,7 +163,7 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	jwtToken, err := util.IssueJWT(userID)
+	jwtToken, err := util.IssueAccessJWT(userID)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
