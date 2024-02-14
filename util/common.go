@@ -2,7 +2,6 @@ package util
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -41,7 +40,6 @@ func GetIntegerParam[T int | int16 | int32 | int64](r *http.Request, key string)
 }
 
 func GetOffsetAndLimit(r *http.Request) (int, int, error) {
-	fmt.Println(r.URL.Query().Encode())
 	page, err := strconv.Atoi(r.URL.Query().Get("page"))
 	if err != nil {
 		page = 1

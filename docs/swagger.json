@@ -1120,6 +1120,68 @@
                 }
             }
         },
+        "/user/{author_id}/articles": {
+            "get": {
+                "description": "유저가 작성한 article 조회",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Article tag"
+                ],
+                "summary": "유저가 작성한 article 조회",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "article 작성자 ID",
+                        "name": "author_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/articledto.ReadArticlesByUserResponseWrapperDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "user_id가 유효하지 않음",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "network error",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/user/{user_id}/article": {
             "post": {
                 "description": "기사를 생성합니다.",
@@ -1554,6 +1616,17 @@
             "properties": {
                 "article": {
                     "$ref": "#/definitions/articledto.ReadArticleResponseDTO"
+                }
+            }
+        },
+        "articledto.ReadArticlesByUserResponseWrapperDTO": {
+            "type": "object",
+            "properties": {
+                "articles": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/articledto.ReadArticleResponseDTO"
+                    }
                 }
             }
         },

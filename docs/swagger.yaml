@@ -116,6 +116,13 @@ definitions:
       article:
         $ref: '#/definitions/articledto.ReadArticleResponseDTO'
     type: object
+  articledto.ReadArticlesByUserResponseWrapperDTO:
+    properties:
+      articles:
+        items:
+          $ref: '#/definitions/articledto.ReadArticleResponseDTO'
+        type: array
+    type: object
   articledto.UpdateArticleRequestDTO:
     properties:
       body:
@@ -935,6 +942,47 @@ paths:
           schema:
             $ref: '#/definitions/types.ErrorResponse'
       summary: Article like
+      tags:
+      - Article tag
+  /user/{author_id}/articles:
+    get:
+      consumes:
+      - application/json
+      description: 유저가 작성한 article 조회
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        type: string
+      - description: article 작성자 ID
+        in: path
+        name: author_id
+        required: true
+        type: integer
+      - description: page number
+        in: query
+        name: page
+        type: integer
+      - description: limit
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/articledto.ReadArticlesByUserResponseWrapperDTO'
+        "400":
+          description: user_id가 유효하지 않음
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+        "500":
+          description: network error
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: 유저가 작성한 article 조회
       tags:
       - Article tag
   /user/{user_id}/article:

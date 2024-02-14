@@ -377,3 +377,38 @@ func DeleteArticleLike(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusNoContent)
 }
+
+// @Summary 유저가 작성한 article 조회
+// @Description 유저가 작성한 article 조회
+// @Tags Article tag
+// @Accept json
+// @Produce json
+// @Param authorization header string false "jwt token"
+// @Param author_id path int true "article 작성자 ID"
+// @Param page query int false "page number"
+// @Param limit query int false "limit"
+// @Success 200 {object} articledto.ReadArticlesByUserResponseWrapperDTO "success"
+// @Failure 400 {object} types.ErrorResponse "user_id가 유효하지 않음"
+// @Failure 500 {object} types.ErrorResponse "network error"
+// @Router /user/{author_id}/articles [get]
+func ReadArticlesByUserID(w http.ResponseWriter, r *http.Request) {
+	userID, err := util.GetIntegerParam[int64](r, "author_id")
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	page, limit, err := util.GetOffsetAndLimit(r)
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	articles, err := repository.ArticleRepo.GetByUserAndOffset(repository.DB, page, limit, userID)
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	responder.ReadArticleByOffsetResponse(w, articles)
+}

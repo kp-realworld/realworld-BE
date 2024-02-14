@@ -154,6 +154,12 @@ var ArticleRouter = [][]*Route{
 			HandlerFunc: article.DeleteArticleLike,
 			Middleware:  []Middleware{UserAuthMiddleware},
 		},
+		{
+			Method:      "GET",
+			Path:        "/user/{author_id}/articles",
+			HandlerFunc: article.ReadArticlesByUserID,
+			Middleware:  []Middleware{UserAuthMiddlewareWithoutVerify},
+		},
 	},
 }
 
