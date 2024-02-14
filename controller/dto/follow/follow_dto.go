@@ -8,7 +8,7 @@ type CreateFollowResponseDTO struct {
 }
 
 type CreateFollowResponseWrapperDTO struct {
-	Profile CreateFollowResponseDTO `json:"profile"`
+	Profile CreateFollowResponseDTO `json:"user"`
 }
 
 type DeleteFollowResponseDTO struct {
@@ -19,5 +19,5 @@ type DeleteFollowResponseDTO struct {
 }
 
 type DeleteFollowResponseWrapperDTO struct {
-	Profile DeleteFollowResponseDTO `json:"profile"`
+	Profile DeleteFollowResponseDTO `json:"user"`
 }

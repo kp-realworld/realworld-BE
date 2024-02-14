@@ -319,7 +319,7 @@ definitions:
     type: object
   followdto.CreateFollowResponseWrapperDTO:
     properties:
-      profile:
+      user:
         $ref: '#/definitions/followdto.CreateFollowResponseDTO'
     type: object
   followdto.DeleteFollowResponseDTO:
@@ -335,7 +335,7 @@ definitions:
     type: object
   followdto.DeleteFollowResponseWrapperDTO:
     properties:
-      profile:
+      user:
         $ref: '#/definitions/followdto.DeleteFollowResponseDTO'
     type: object
   types.ErrorDetail:
@@ -349,6 +349,15 @@ definitions:
     properties:
       error:
         $ref: '#/definitions/types.ErrorDetail'
+    type: object
+  userdto.ReadMyProfileResponseDTO:
+    properties:
+      bio:
+        type: string
+      profile_image:
+        type: string
+      username:
+        type: string
     type: object
   userdto.ReadUserProfileResponseDTO:
     properties:
@@ -613,6 +622,34 @@ paths:
       tags:
       - Article tag
   /my/profile:
+    get:
+      consumes:
+      - application/json
+      description: 내 프로필 조회
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/userdto.ReadMyProfileResponseDTO'
+        "404":
+          description: user 정보가 없는 경우
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+        "500":
+          description: network error
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: 내 프로필 조회
+      tags:
+      - Profile tag
     put:
       consumes:
       - application/json
