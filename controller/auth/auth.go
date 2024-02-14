@@ -195,10 +195,10 @@ func VerifyUsername(w http.ResponseWriter, r *http.Request) {
 	user, err := repository.UserRepo.GetByUsername(repository.DB, verifyReq.Username)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
-
 		return
 	} else if user != nil {
 		responder.ErrorResponse(w, http.StatusConflict, "already username")
+		return
 	}
 
 	responder.VerifyUsernameResponse(w, verifyReq.Username)
@@ -241,6 +241,7 @@ func VerifyEmail(w http.ResponseWriter, r *http.Request) {
 		return
 	} else if user != nil {
 		responder.ErrorResponse(w, http.StatusConflict, "already email")
+		return
 	}
 
 	responder.VerifyEmailResponse(w, verifyReq.Email)
