@@ -8,13 +8,14 @@ import (
 	"github.com/hotkimho/realworld-api/models"
 )
 
-func SignInResponse(w http.ResponseWriter, user models.User, token string) {
+func SignInResponse(w http.ResponseWriter, user models.User, accessToken, refreshToken string) {
 
 	wrapper := authdto.SignInResponseWrapperDTO{
 		User: authdto.SignInResponseDTO{
-			UserID:   user.UserID,
-			Username: user.Username,
-			Token:    token,
+			UserID:       user.UserID,
+			Username:     user.Username,
+			AccessToken:  accessToken,
+			RefreshToken: refreshToken,
 		},
 	}
 

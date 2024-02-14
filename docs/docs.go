@@ -1633,7 +1633,10 @@ const docTemplate = `{
         "authdto.SignInResponseDTO": {
             "type": "object",
             "properties": {
-                "token": {
+                "access_token": {
+                    "type": "string"
+                },
+                "refresh_token": {
                     "type": "string"
                 },
                 "user_id": {

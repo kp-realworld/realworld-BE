@@ -15,7 +15,7 @@ DB = 0
 [auth]
 # 리프레시 토큰 만료 기간, 액세스 토큰 만료 기간
 RefreshTokenExpire = 144
-AccessTokenExpire = 24
+AccessTokenExpire = 12
 Secret = "0b6e149dd96b303e824a2aed87f14dc4"
 Issuer = "dev-kp-realworld"
 

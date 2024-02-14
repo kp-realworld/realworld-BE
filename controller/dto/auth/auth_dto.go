@@ -24,9 +24,10 @@ type SignInRequestDTO struct {
 }
 
 type SignInResponseDTO struct {
-	UserID   int64  `json:"user_id,omitempty"`
-	Username string `json:"username,omitempty"`
-	Token    string `json:"token"`
+	UserID       int64  `json:"user_id,omitempty"`
+	Username     string `json:"username,omitempty"`
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 type SignInResponseWrapperDTO struct {
