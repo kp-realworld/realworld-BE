@@ -16,7 +16,7 @@ import (
 // header에 authorization이 있어야 한다.
 // @Summary Read user profile
 // @Description Read user profile
-// @Tags User tag
+// @Tags Profile tag
 // @Accept json
 // @Produce json
 // @Param user_id path int true "user_id"
@@ -53,28 +53,22 @@ func ReadUserProfile(w http.ResponseWriter, r *http.Request) {
 
 // @Summary Update user profile
 // @Description Update user profile
-// @Tags User tag
+// @Tags Profile tag
 // @Accept json
 // @Produce json
-// @Param user_id path int true "user_id"
 // @Param authorization header string true "jwt token"
 // @Param updateUserProfileReq body userdto.UpdateUserProfileRequestDTO true "updateUserProfileReq"
 // @Success 200 {object} userdto.UpdateUserProfileResponseWrapperDTO "success"
 // @Failure 400 {object} types.ErrorResponse "bad request"
 // @Failure 422 {object} types.ErrorResponse "요청을 제대로 수행하지 못함"
 // @Failure 500 {object} types.ErrorResponse "network error"
-// @Router /user/{user_id}/profile [put]
+// @Router /my/profile [put]
 func UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
+	ctxUserID := r.Context().Value("ctx_user_id").(int64)
 
-	userID, err := strconv.ParseInt(vars["user_id"], 10, 64)
-	if err != nil {
-		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
-		return
-	}
 	var updateUserProfileReq userdto.UpdateUserProfileRequestDTO
 
-	err = json.NewDecoder(r.Body).Decode(&updateUserProfileReq)
+	err := json.NewDecoder(r.Body).Decode(&updateUserProfileReq)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
@@ -100,7 +94,7 @@ func UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
 		password = &hashedPass
 	}
 
-	user, err := repository.UserRepo.UpdateUserProfileByID(repository.DB, updateUserProfileReq, userID, password)
+	user, err := repository.UserRepo.UpdateUserProfileByID(repository.DB, updateUserProfileReq, ctxUserID, password)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return

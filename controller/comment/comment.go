@@ -15,18 +15,18 @@ import (
 // @Accept json
 // @Produce json
 // @Param authorization header string true "jwt token"
-// @Param user_id path int true "article author id(기사 소유자)"
+// @Param author_id path int true "article author id(기사 소유자)"
 // @Param article_id path int true "article id(기사 ID)"
 // @Param createCommentReq body commentdto.CreateCommentRequestDTO true "댓글 내용"
 // @Success 201 {object} commentdto.CreateCommentResponseDTO
 // @Failure 400 {object} types.ErrorResponse "잘못된 값을 요청한 경우"
 // @Failure 422 {object} types.ErrorResponse "요청을 처리하지 못한 경우"
 // @Failure 500 {object} types.ErrorResponse "네트워크 에러"
-// @Router /user/{user_id}/article/{article_id}/comment [post]
+// @Router /user/{author_id}/article/{article_id}/comment [post]
 func CreateComment(w http.ResponseWriter, r *http.Request) {
 
 	ctxUserID := r.Context().Value("ctx_user_id").(int64)
-	authorID, err := util.GetIntegerParam[int64](r, "user_id")
+	authorID, err := util.GetIntegerParam[int64](r, "author_id")
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
@@ -72,14 +72,14 @@ func CreateComment(w http.ResponseWriter, r *http.Request) {
 // @Tags Comment tag
 // @Accept json
 // @Produce json
-// @Param user_id path int true "article author id(기사 소유자)"
+// @Param author_id path int true "article author id(기사 소유자)"
 // @Param article_id path int true "article id(기사 ID)"
 // @Success 200 {object} commentdto.ReadCommentsResponseWrapperDTO
 // @Failure 400 {object} types.ErrorResponse "잘못된 값을 요청한 경우"
 // @Failure 500 {object} types.ErrorResponse "네트워크 에러"
-// @Router /user/{user_id}/article/{article_id}/comments [get]
+// @Router /user/{author_id}/article/{article_id}/comments [get]
 func ReadComments(w http.ResponseWriter, r *http.Request) {
-	authorID, err := util.GetIntegerParam[int64](r, "user_id")
+	authorID, err := util.GetIntegerParam[int64](r, "author_id")
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
@@ -113,7 +113,7 @@ func ReadComments(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param authorization header string true "jwt token"
-// @Param user_id path int true "article author id(기사 소유자)"
+// @Param author_id path int true "article author id(기사 소유자)"
 // @Param article_id path int true "article id(기사 ID)"
 // @Param comment_id path int true "comment id(댓글 ID)"
 // @Param updateCommentReq body commentdto.UpdateCommentRequestDTO true "updateCommentReq"
@@ -124,7 +124,7 @@ func ReadComments(w http.ResponseWriter, r *http.Request) {
 // @Router /user/{user_id}/article/{article_id}/comment/{comment_id} [put]
 func UpdateComment(w http.ResponseWriter, r *http.Request) {
 	ctxUserID := r.Context().Value("ctx_user_id").(int64)
-	authorID, err := util.GetIntegerParam[int64](r, "user_id")
+	authorID, err := util.GetIntegerParam[int64](r, "author_id")
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
@@ -180,16 +180,16 @@ func UpdateComment(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param authorization header string true "jwt token"
-// @Param user_id path int true "article author id(기사 소유자)"
+// @Param author_id path int true "article author id(기사 소유자)"
 // @Param article_id path int true "article id(기사 ID)"
 // @Param comment_id path int true "comment id(댓글 ID)"
 // @Success 204 {object} string "정상적으로 삭제됨"
 // @Failure 400 {object} types.ErrorResponse "잘못된 값을 요청한 경우"
 // @Failure 500 {object} types.ErrorResponse "네트워크 에러"
-// @Router /user/{user_id}/article/{article_id}/comment/{comment_id} [delete]
+// @Router /user/{author_id}/article/{article_id}/comment/{comment_id} [delete]
 func DeleteComment(w http.ResponseWriter, r *http.Request) {
 	ctxUserID := r.Context().Value("ctx_user_id").(int64)
-	authorID, err := util.GetIntegerParam[int64](r, "user_id")
+	authorID, err := util.GetIntegerParam[int64](r, "author_id")
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
 		return

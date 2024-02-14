@@ -129,20 +129,14 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 // @Produce json
 // @Param authorization header string true "jwt token"
 // @Success 200 {object} authdto.RefreshTokenResponseDTO "success"
-// @Failure 400 {object} types.ErrorResponse "입력값이 유효하지 않음"
+// @Failure 400 {object} types.ErrorResponse "토큰이 없는 경우"
 // @Failure 500 {object} types.ErrorResponse "network error"
-// @Router /user/{user_id}/refresh [get]
+// @Router /token-refresh [get]
 func RefreshToken(w http.ResponseWriter, r *http.Request) {
 
 	token := r.Header.Get("Authorization")
 	if token == "" {
 		responder.ErrorResponse(w, http.StatusBadRequest, "token is empty")
-		return
-	}
-
-	userID, err := util.GetIntegerParam[int64](r, "user_id")
-	if err != nil {
-		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -157,19 +151,16 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if claim, ok := parsedToken.Claims.(*types.JWTClaims); ok && parsedToken.Valid {
-		if claim.UserID != userID {
-			responder.ErrorResponse(w, http.StatusBadRequest, "invalid token and user_id")
+		jwtToken, err := util.IssueAccessJWT(claim.UserID)
+		if err != nil {
+			responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
 		}
-	}
-
-	jwtToken, err := util.IssueAccessJWT(userID)
-	if err != nil {
-		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
+		responder.RefreshTokenResponse(w, jwtToken)
 		return
 	}
 
-	responder.RefreshTokenResponse(w, jwtToken)
+	responder.ErrorResponse(w, http.StatusUnauthorized, "invalid token")
 }
 
 // @Summary 유저네임 중복 확인
