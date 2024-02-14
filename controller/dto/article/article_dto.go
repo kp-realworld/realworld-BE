@@ -54,6 +54,10 @@ type ReadArticleByOffsetResponseWrapperDTO struct {
 	Articles []ReadArticleResponseDTO `json:"articles"`
 }
 
+type ReadArticlesByUserResponseWrapperDTO struct {
+	Articles []ReadArticleResponseDTO `json:"articles"`
+}
+
 type UpdateArticleRequestDTO struct {
 	Title       *string  `json:"title,omitempty"`
 	Description *string  `json:"description,omitempty"`
