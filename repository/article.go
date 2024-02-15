@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/hotkimho/realworld-api/types"
+	"time"
 
 	"gorm.io/gorm"
 
@@ -19,7 +20,7 @@ func NewArticleRepository() *articleRepository {
 
 func (repo *articleRepository) Create(db *gorm.DB, requestDTO articledto.CreateArticleRequestDTO, userID int64) (*models.Article, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
 	article := models.Article{
@@ -45,7 +46,7 @@ func (repo *articleRepository) Create(db *gorm.DB, requestDTO articledto.CreateA
 // 트랜잭션을 써서 article을 생성하고 article_tag를 생성하는 함수
 func (repo *articleRepository) CreateWithTransaction(db *gorm.DB, requestDTO articledto.CreateArticleRequestDTO, userID int64) (*models.Article, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
 	tx := db.WithContext(ctx).Begin()
@@ -75,7 +76,7 @@ func (repo *articleRepository) CreateWithTransaction(db *gorm.DB, requestDTO art
 
 func (repo *articleRepository) GetByID(db *gorm.DB, articleID, userID int64) (*models.Article, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
 	article := models.Article{
@@ -103,7 +104,7 @@ func (repo *articleRepository) GetByID(db *gorm.DB, articleID, userID int64) (*m
 
 func (repo *articleRepository) GetByOffset(db *gorm.DB, offset, limit int, userID int64) ([]models.Article, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
 	var articles []models.Article
@@ -128,7 +129,7 @@ func (repo *articleRepository) GetByOffset(db *gorm.DB, offset, limit int, userI
 
 func (repo *articleRepository) GetByOffsetAndTag(db *gorm.DB, offset, limit int, tag string) ([]models.Article, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
 	var articles []models.Article
@@ -155,7 +156,7 @@ func (repo *articleRepository) GetByOffsetAndTag(db *gorm.DB, offset, limit int,
 
 func (repo *articleRepository) GetByUserAndOffset(db *gorm.DB, offset, limit int, userID int64) ([]models.Article, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
 	var articles []models.Article
@@ -179,7 +180,7 @@ func (repo *articleRepository) GetByUserAndOffset(db *gorm.DB, offset, limit int
 
 func (repo *articleRepository) UpdateByID(db *gorm.DB, requestDTO articledto.UpdateArticleRequestDTO, articleID, userID int64) (*models.Article, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
 	article := models.Article{
@@ -227,7 +228,7 @@ func (repo *articleRepository) UpdateByID(db *gorm.DB, requestDTO articledto.Upd
 }
 
 func (repo *articleRepository) DeleteByID(db *gorm.DB, articleID, userID int64) error {
-	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
 	article := models.Article{
@@ -282,7 +283,7 @@ func (repo *articleRepository) UpdateWithTransaction(db *gorm.DB, requestDTO art
 }
 
 func (repo *articleRepository) ValidateArticleOwner(db *gorm.DB, articleID, userID int64) error {
-	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
 	var article models.Article

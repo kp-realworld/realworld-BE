@@ -21,3 +21,6 @@ Issuer = "dev-kp-realworld"
 
 [swagger]
 Host = "https://api.kp-realworld.com/swagger/doc.json"
+
+[sentry]
+Dsn = "https://2355f663979b763e68d7f34270bc8eb8@o4506706740641792.ingest.sentry.io/4506706742673408"

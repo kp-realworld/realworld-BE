@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"github.com/hotkimho/realworld-api/types"
+	"time"
 
 	"gorm.io/gorm"
 
@@ -17,7 +18,7 @@ func NewArticleTagRepository() *articleTagRepository {
 
 func (repo *articleTagRepository) Create(db *gorm.DB, articleID int64, tagList []string) (int, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
 	articleTags := make([]models.ArticleTag, 0)
@@ -39,7 +40,7 @@ func (repo *articleTagRepository) Create(db *gorm.DB, articleID int64, tagList [
 
 func (repo *articleTagRepository) Update(db *gorm.DB, articleID int64, tagList []string) error {
 
-	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
 	err := db.WithContext(ctx).Where(models.ArticleTag{ArticleID: articleID}).Delete(&models.ArticleTag{}).Error

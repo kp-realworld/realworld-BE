@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/hotkimho/realworld-api/types"
 	"gorm.io/gorm"
+	"time"
 
 	"github.com/hotkimho/realworld-api/models"
 )
@@ -15,7 +16,7 @@ func NewArticleLikeRepository() *articleLikeRepository {
 }
 
 func (repo *articleLikeRepository) Create(db *gorm.DB, articleID int64, userID int64) error {
-	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
 	articleLike := models.ArticleLike{
@@ -32,7 +33,7 @@ func (repo *articleLikeRepository) Create(db *gorm.DB, articleID int64, userID i
 }
 
 func (repo *articleLikeRepository) Delete(db *gorm.DB, articleID int64, userID int64) error {
-	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
 	err := db.WithContext(ctx).Where("article_id = ? AND user_id = ?", articleID, userID).Delete(&models.ArticleLike{}).Error
@@ -45,7 +46,7 @@ func (repo *articleLikeRepository) Delete(db *gorm.DB, articleID int64, userID i
 // 이미 좋아요 했는지 확인
 func (repo *articleLikeRepository) IsLiked(db *gorm.DB, articleID int64, userID int64) (bool, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
 	articleLike := models.ArticleLike{

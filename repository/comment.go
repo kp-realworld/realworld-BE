@@ -7,6 +7,7 @@ import (
 	"github.com/hotkimho/realworld-api/models"
 	"github.com/hotkimho/realworld-api/types"
 	"gorm.io/gorm"
+	"time"
 )
 
 type commentRepository struct{}
@@ -21,7 +22,7 @@ func (repo *commentRepository) Create(
 	userID, articleID int64,
 ) (*models.Comment, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
 	comment := models.Comment{
@@ -48,7 +49,7 @@ func (repo *commentRepository) GetByArticle(
 	articleID int64,
 ) ([]models.Comment, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
 	var comments []models.Comment
@@ -70,7 +71,7 @@ func (repo *commentRepository) UpdateByID(
 	commentID, ctxUserID, articleID int64,
 ) (*models.Comment, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
 	updateData := map[string]interface{}{}
@@ -115,7 +116,7 @@ func (repo *commentRepository) DeleteByID(
 	commentID, ctxUserID, articleID int64,
 ) error {
 
-	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
 	comment := models.Comment{

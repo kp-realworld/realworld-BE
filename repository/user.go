@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/hotkimho/realworld-api/types"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -19,7 +20,7 @@ func NewUserRepository() *userRepository {
 }
 
 func (repo *userRepository) Create(db *gorm.DB, user models.User) (*models.User, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
 	err := db.WithContext(ctx).Create(&user).Error
@@ -32,7 +33,7 @@ func (repo *userRepository) Create(db *gorm.DB, user models.User) (*models.User,
 
 func (repo *userRepository) GetByEmail(db *gorm.DB, email string) (*models.User, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
 	var user models.User
@@ -53,7 +54,7 @@ func (repo *userRepository) GetByEmail(db *gorm.DB, email string) (*models.User,
 
 func (repo *userRepository) GetByUsername(db *gorm.DB, username string) (*models.User, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
 	var user models.User
@@ -74,7 +75,7 @@ func (repo *userRepository) GetByUsername(db *gorm.DB, username string) (*models
 
 func (repo *userRepository) GetByID(db *gorm.DB, id int64) (*models.User, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
 	var user models.User
@@ -93,7 +94,7 @@ func (repo *userRepository) GetByID(db *gorm.DB, id int64) (*models.User, error)
 
 func (repo *userRepository) UpdateUserProfileByID(db *gorm.DB, updateRequest userdto.UpdateUserProfileRequestDTO, id int64, password *string) (*models.User, error) {
 
-	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
 	var user models.User
@@ -126,7 +127,7 @@ func (repo *userRepository) UpdateUserProfileByID(db *gorm.DB, updateRequest use
 
 func (repo *userRepository) CheckEmailOrUsername(db *gorm.DB, email, username string) bool {
 
-	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
 	var user models.User
