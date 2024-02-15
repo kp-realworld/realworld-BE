@@ -1,9 +1,11 @@
 package repository
 
 import (
+	"context"
 	"errors"
 	commentdto "github.com/hotkimho/realworld-api/controller/dto/comment"
 	"github.com/hotkimho/realworld-api/models"
+	"github.com/hotkimho/realworld-api/types"
 	"gorm.io/gorm"
 )
 
@@ -19,18 +21,21 @@ func (repo *commentRepository) Create(
 	userID, articleID int64,
 ) (*models.Comment, error) {
 
+	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	defer cancel()
+
 	comment := models.Comment{
 		Body:      requestDTO.Body,
 		UserID:    userID,
 		ArticleID: articleID,
 	}
 
-	err := db.Model(comment).Create(&comment).Error
+	err := db.WithContext(ctx).Model(comment).Create(&comment).Error
 	if err != nil {
 		return nil, err
 	}
 
-	err = db.Model(comment).Association("User").Find(&comment.User)
+	err = db.WithContext(ctx).Model(comment).Association("User").Find(&comment.User)
 	if err != nil {
 		return nil, err
 	}
@@ -43,9 +48,12 @@ func (repo *commentRepository) GetByArticle(
 	articleID int64,
 ) ([]models.Comment, error) {
 
+	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	defer cancel()
+
 	var comments []models.Comment
 
-	err := db.Model(&models.Comment{}).
+	err := db.WithContext(ctx).Model(&models.Comment{}).
 		Preload("User").
 		Find(&comments, "article_id = ?", articleID).
 		Error
@@ -62,6 +70,9 @@ func (repo *commentRepository) UpdateByID(
 	commentID, ctxUserID, articleID int64,
 ) (*models.Comment, error) {
 
+	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	defer cancel()
+
 	updateData := map[string]interface{}{}
 
 	updateData["body"] = requestDTO.Body
@@ -73,7 +84,7 @@ func (repo *commentRepository) UpdateByID(
 	}
 
 	// 먼저 게시글에 댓글이 있는지 확인
-	err := db.Model(&models.Comment{}).
+	err := db.WithContext(ctx).Model(&models.Comment{}).
 		Where(comment).
 		First(&comment).
 		Error
@@ -85,7 +96,7 @@ func (repo *commentRepository) UpdateByID(
 		return nil, err
 	}
 
-	err = db.Model(&models.Comment{}).
+	err = db.WithContext(ctx).Model(&models.Comment{}).
 		Preload("User").
 		Where(comment).
 		Updates(updateData).
@@ -104,6 +115,9 @@ func (repo *commentRepository) DeleteByID(
 	commentID, ctxUserID, articleID int64,
 ) error {
 
+	ctx, cancel := context.WithTimeout(context.Background(), types.DEFAULT_TIMEOUT_SEC)
+	defer cancel()
+
 	comment := models.Comment{
 		ID:        commentID,
 		UserID:    ctxUserID,
@@ -111,7 +125,7 @@ func (repo *commentRepository) DeleteByID(
 	}
 
 	// 먼저 게시글에 댓글이 있는지 확인
-	err := db.Model(&models.Comment{}).
+	err := db.WithContext(ctx).Model(&models.Comment{}).
 		Where(comment).
 		First(&comment).
 		Error

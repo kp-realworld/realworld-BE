@@ -7,3 +7,7 @@ const (
 const (
 	DEFAULT_PAGE_LIMIT = 10
 )
+
+const (
+	DEFAULT_TIMEOUT_SEC = 5
+)
