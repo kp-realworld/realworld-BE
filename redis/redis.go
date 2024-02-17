@@ -3,10 +3,13 @@ package redis
 import (
 	"context"
 	"fmt"
-	"github.com/getsentry/sentry-go"
-	"github.com/hotkimho/realworld-api/types"
-	"github.com/redis/go-redis/v9"
 	"time"
+
+	"github.com/getsentry/sentry-go"
+	"github.com/redis/go-redis/v9"
+
+	"github.com/hotkimho/realworld-api/env"
+	"github.com/hotkimho/realworld-api/types"
 )
 
 type redisManager struct {
@@ -23,6 +26,7 @@ func Init() error {
 
 // redis 연결
 func (r *redisManager) Connect() {
+	addr := fmt.Sprintf("%s:%d", env.Config.Redis.Host, 6379)
 	r.redisClient = redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
 		Password: "", // no password set
