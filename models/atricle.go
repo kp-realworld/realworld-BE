@@ -13,7 +13,7 @@ type Article struct {
 	Title         string `gorm:"type:varchar(128); not null" json:"title"`
 	Description   string `gorm:"type:varchar(128); not null" json:"description"`
 	Body          string `gorm:"type:varchar(128); not null" json:"body"`
-	FavoriteCount int    `gorm:"type:int(11); not null; default:0" json:"favorite_count"`
+	FavoriteCount int64  `gorm:"type:bigint(20); not null; default:0" json:"favorite_count"`
 	User          User
 	Comments      []Comment
 	Tags          []ArticleTag
@@ -36,6 +36,15 @@ type ArticleLike struct {
 	ID        int64          `gorm:"primary_key" json:"id"`
 	UserID    int64          `gorm:"type:bigint(20); not null; foreignKey:UserID;" json:"user_id"`
 	ArticleID int64          `gorm:"type:bigint(20); not null; foreignKey:ArticleID;" json:"article_id"`
+	CreatedAt time.Time      `gorm:"type:datetime; not null; default:CURRENT_TIMESTAMP" json:"created_at"`
+	UpdatedAt *time.Time     `gorm:"type:datetime; null; default:null" json:"updated_at"`
+	DeletedAt gorm.DeletedAt `gorm:"index"`
+}
+
+// article liek 수 저장 테이블
+type ArticleLikeCount struct {
+	ArticleID int64          `gorm:"type:bigint(20); not null; foreignKey:ArticleID; primaryKey" json:"article_id"`
+	Count     int64          `gorm:"type:int(11); not null; default:0" json:"count"`
 	CreatedAt time.Time      `gorm:"type:datetime; not null; default:CURRENT_TIMESTAMP" json:"created_at"`
 	UpdatedAt *time.Time     `gorm:"type:datetime; null; default:null" json:"updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"index"`

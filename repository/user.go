@@ -1,7 +1,10 @@
 package repository
 
 import (
+	"context"
 	"errors"
+	"github.com/hotkimho/realworld-api/types"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -17,8 +20,10 @@ func NewUserRepository() *userRepository {
 }
 
 func (repo *userRepository) Create(db *gorm.DB, user models.User) (*models.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
+	defer cancel()
 
-	err := db.Create(&user).Error
+	err := db.WithContext(ctx).Create(&user).Error
 	if err != nil {
 		return nil, err
 	}
@@ -28,9 +33,12 @@ func (repo *userRepository) Create(db *gorm.DB, user models.User) (*models.User,
 
 func (repo *userRepository) GetByEmail(db *gorm.DB, email string) (*models.User, error) {
 
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
+	defer cancel()
+
 	var user models.User
 
-	err := db.Where(&models.User{Email: email}).First(&user).Error
+	err := db.WithContext(ctx).Where(&models.User{Email: email}).First(&user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
@@ -46,9 +54,12 @@ func (repo *userRepository) GetByEmail(db *gorm.DB, email string) (*models.User,
 
 func (repo *userRepository) GetByUsername(db *gorm.DB, username string) (*models.User, error) {
 
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
+	defer cancel()
+
 	var user models.User
 
-	err := db.Where(&models.User{Username: username}).First(&user).Error
+	err := db.WithContext(ctx).Where(&models.User{Username: username}).First(&user).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
@@ -64,9 +75,12 @@ func (repo *userRepository) GetByUsername(db *gorm.DB, username string) (*models
 
 func (repo *userRepository) GetByID(db *gorm.DB, id int64) (*models.User, error) {
 
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
+	defer cancel()
+
 	var user models.User
 
-	err := db.Where(&models.User{UserID: id}).First(&user)
+	err := db.WithContext(ctx).Where(&models.User{UserID: id}).First(&user)
 	if err.Error != nil {
 		if errors.Is(err.Error, gorm.ErrRecordNotFound) {
 			return nil, nil
@@ -79,6 +93,9 @@ func (repo *userRepository) GetByID(db *gorm.DB, id int64) (*models.User, error)
 }
 
 func (repo *userRepository) UpdateUserProfileByID(db *gorm.DB, updateRequest userdto.UpdateUserProfileRequestDTO, id int64, password *string) (*models.User, error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
+	defer cancel()
 
 	var user models.User
 
@@ -100,7 +117,7 @@ func (repo *userRepository) UpdateUserProfileByID(db *gorm.DB, updateRequest use
 		updateData["password"] = password
 	}
 
-	err := db.Model(&models.User{UserID: id}).Updates(updateData).First(&user).Error
+	err := db.WithContext(ctx).Model(&models.User{UserID: id}).Updates(updateData).First(&user).Error
 	if err != nil {
 		return nil, err
 	}
@@ -110,9 +127,12 @@ func (repo *userRepository) UpdateUserProfileByID(db *gorm.DB, updateRequest use
 
 func (repo *userRepository) CheckEmailOrUsername(db *gorm.DB, email, username string) bool {
 
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
+	defer cancel()
+
 	var user models.User
 
-	err := db.Where(models.User{Email: email}).Or(models.User{Username: username}).First(&user).Error
+	err := db.WithContext(ctx).Where(models.User{Email: email}).Or(models.User{Username: username}).First(&user).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return true
 	}

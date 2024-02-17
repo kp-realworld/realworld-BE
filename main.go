@@ -3,10 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/getsentry/sentry-go"
+	"github.com/hotkimho/realworld-api/redis"
+
 	//_ "github.com/swaggo/http-swagger/example/gorilla/docs"
 	"net/http"
 
-	"github.com/getsentry/sentry-go"
 	"github.com/sirupsen/logrus"
 
 	_ "github.com/hotkimho/realworld-api/docs"
@@ -34,27 +36,37 @@ func main() {
 	config := flag.String("config", "config/local-env.toml", "config file path")
 	flag.Parse()
 
+	// 환경 설정
 	if err := env.SetConfig(*config); err != nil {
 		fmt.Println(err)
 		return
 	}
 
+	// Sentry 설정
+	err := sentry.Init(sentry.ClientOptions{
+		Dsn:              env.Config.Sentry.DSN,
+		EnableTracing:    true,
+		TracesSampleRate: 1.0,
+	})
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// 타임존 설정
 	if err := env.InitTimeZone(); err != nil {
 		fmt.Println(err)
 		return
 	}
 
+	// RDB 설정
 	if err := repository.Init(); err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	err := sentry.Init(sentry.ClientOptions{
-		Dsn:              "https://2355f663979b763e68d7f34270bc8eb8@o4506706740641792.ingest.sentry.io/4506706742673408",
-		EnableTracing:    true,
-		TracesSampleRate: 1.0,
-	})
-	if err != nil {
+	// Redis 설정
+	if err := redis.Init(); err != nil {
 		fmt.Println(err)
 		return
 	}

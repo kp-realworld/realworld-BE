@@ -94,6 +94,13 @@ func ReadArticleByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// 게시글 좋아요 조회
+	article.FavoriteCount, err = repository.ArticleLikeCountRepo.GetByArticle(repository.DB, article.ID)
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
 	responder.ReadArticleByIDResponse(w, *article, isFollowing)
 }
 
@@ -126,7 +133,18 @@ func ReadArticleByOffset(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responder.ReadArticleByOffsetResponse(w, articles)
+	articleIDSlice := make([]int64, 0)
+	for _, article := range articles {
+		articleIDSlice = append(articleIDSlice, article.ID)
+	}
+
+	articleLikeCounts, err := repository.ArticleLikeCountRepo.GetByArticles(repository.DB, articleIDSlice)
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	responder.ReadArticleByOffsetResponse(w, articles, articleLikeCounts)
 }
 
 // @Summary Update article
@@ -170,6 +188,13 @@ func UpdateArticle(w http.ResponseWriter, r *http.Request) {
 		return
 	} else if article == nil {
 		responder.ErrorResponse(w, http.StatusBadRequest, "invalid request")
+		return
+	}
+
+	// 게시글 좋아요 조회
+	article.FavoriteCount, err = repository.ArticleLikeCountRepo.GetByArticle(repository.DB, article.ID)
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -234,7 +259,18 @@ func ReadMyArticleByOffset(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responder.ReadArticleByOffsetResponse(w, articles)
+	articleIDSlice := make([]int64, 0)
+	for _, article := range articles {
+		articleIDSlice = append(articleIDSlice, article.ID)
+	}
+
+	articleLikeCounts, err := repository.ArticleLikeCountRepo.GetByArticles(repository.DB, articleIDSlice)
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	responder.ReadArticleByOffsetResponse(w, articles, articleLikeCounts)
 }
 
 // @Summary Read article by tag
@@ -266,7 +302,18 @@ func ReadArticleByTag(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responder.ReadArticleByOffsetResponse(w, articles)
+	articleIDSlice := make([]int64, 0)
+	for _, article := range articles {
+		articleIDSlice = append(articleIDSlice, article.ID)
+	}
+
+	articleLikeCounts, err := repository.ArticleLikeCountRepo.GetByArticles(repository.DB, articleIDSlice)
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	responder.ReadArticleByOffsetResponse(w, articles, articleLikeCounts)
 }
 
 // @Summary Article like
@@ -312,7 +359,7 @@ func CreateArticleLike(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !like {
-		err = repository.ArticleLikeRepo.Create(repository.DB, articleID, ctxUserID)
+		err = repository.ArticleLikeRepo.CreateWithTransaction(repository.DB, articleID, ctxUserID)
 		if err != nil {
 			responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
 			return
@@ -328,6 +375,7 @@ func CreateArticleLike(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// 이미 좋아요를 누른 상태면 200, 아니면 201
 	if like {
 		responder.CreateArticleLikeResponse(w, http.StatusOK, *article)
 	} else {
@@ -347,11 +395,11 @@ func CreateArticleLike(w http.ResponseWriter, r *http.Request) {
 // @Failure 400 {object} types.ErrorResponse "user_id, article id가 유효하지 않음"
 // @Failure 404 {object} types.ErrorResponse "기사를 찾지 못한 경우"
 // @Failure 500 {object} types.ErrorResponse "network error"
-// @Router /user/{user_id}/article/{article_id}/like [delete]
+// @Router /user/{author_id}/article/{article_id}/like [delete]
 func DeleteArticleLike(w http.ResponseWriter, r *http.Request) {
 	ctxUserID := r.Context().Value("ctx_user_id").(int64)
 
-	userID, err := util.GetIntegerParam[int64](r, "user_id")
+	userID, err := util.GetIntegerParam[int64](r, "author_id")
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
@@ -369,7 +417,7 @@ func DeleteArticleLike(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = repository.ArticleLikeRepo.Delete(repository.DB, articleID, ctxUserID)
+	err = repository.ArticleLikeRepo.DeleteWithTransaction(repository.DB, articleID, ctxUserID)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
@@ -410,5 +458,16 @@ func ReadArticlesByUserID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responder.ReadArticleByOffsetResponse(w, articles)
+	articleIDSlice := make([]int64, 0)
+	for _, article := range articles {
+		articleIDSlice = append(articleIDSlice, article.ID)
+	}
+
+	articleLikeCounts, err := repository.ArticleLikeCountRepo.GetByArticles(repository.DB, articleIDSlice)
+	if err != nil {
+		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	responder.ReadArticleByOffsetResponse(w, articles, articleLikeCounts)
 }

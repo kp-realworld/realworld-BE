@@ -32,11 +32,16 @@ type SwaggerSetting struct {
 	Host string
 }
 
+type SentrySetting struct {
+	DSN string
+}
+
 type ConfigSetting struct {
 	Database DatabaseSetting `toml:"database"`
 	Redis    RedisSetting    `toml:"redis"`
 	Auth     AuthSetting     `toml:"auth"`
 	Swagger  SwaggerSetting  `toml:"swagger"`
+	Sentry   SentrySetting   `toml:"sentry"`
 }
 
 var Config ConfigSetting

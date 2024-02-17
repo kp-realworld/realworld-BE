@@ -1,7 +1,9 @@
 package repository
 
 import (
-	"fmt"
+	"context"
+	"github.com/hotkimho/realworld-api/types"
+	"time"
 
 	"gorm.io/gorm"
 
@@ -16,6 +18,9 @@ func NewArticleTagRepository() *articleTagRepository {
 
 func (repo *articleTagRepository) Create(db *gorm.DB, articleID int64, tagList []string) (int, error) {
 
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
+	defer cancel()
+
 	articleTags := make([]models.ArticleTag, 0)
 
 	for _, tag := range tagList {
@@ -24,11 +29,9 @@ func (repo *articleTagRepository) Create(db *gorm.DB, articleID int64, tagList [
 			Tag:       tag,
 		})
 	}
-	fmt.Println("articleTags : ", articleTags)
 
-	err := db.Create(&articleTags).Error
+	err := db.WithContext(ctx).Create(&articleTags).Error
 	if err != nil {
-		fmt.Println("error: ", err)
 		return 0, err
 	}
 
@@ -37,9 +40,10 @@ func (repo *articleTagRepository) Create(db *gorm.DB, articleID int64, tagList [
 
 func (repo *articleTagRepository) Update(db *gorm.DB, articleID int64, tagList []string) error {
 
-	// 기존의 article_tag를 soft delete
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
+	defer cancel()
 
-	err := db.Where(models.ArticleTag{ArticleID: articleID}).Delete(&models.ArticleTag{}).Error
+	err := db.WithContext(ctx).Where(models.ArticleTag{ArticleID: articleID}).Delete(&models.ArticleTag{}).Error
 	if err != nil {
 		return err
 	}
