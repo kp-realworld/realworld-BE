@@ -28,7 +28,7 @@ func Init() error {
 func (r *redisManager) Connect() {
 	addr := fmt.Sprintf("%s:%d", env.Config.Redis.Host, 6379)
 	r.redisClient = redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
+		Addr:     addr,
 		Password: "", // no password set
 		DB:       0,  // use default DB
 	})
