@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"github.com/hotkimho/realworld-api/redis"
 	"github.com/hotkimho/realworld-api/types"
 	"gorm.io/gorm"
 	"time"
@@ -40,6 +41,7 @@ func (repo *articleLikeRepository) Delete(db *gorm.DB, articleID int64, userID i
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -63,4 +65,84 @@ func (repo *articleLikeRepository) IsLiked(db *gorm.DB, articleID int64, userID 
 	}
 
 	return true, nil
+}
+
+// 좋아요 유저와 summary 같이 저장
+func (repo *articleLikeRepository) CreateWithTransaction(db *gorm.DB, articleID, userID int64) error {
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
+	defer cancel()
+
+	tx := db.WithContext(ctx).Begin()
+
+	err := repo.Create(tx, articleID, userID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = NewArticleLikeCountRepository().Create(tx, articleID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// 캐시에 설정하는게 실패 했다면 에러가 아닌 키를 삭제
+	err = redis.RedisManager.IncreaseArticleLike(articleID)
+	if err != nil {
+		// 캐시 삭제도 에러가 발생하면 rollback
+		err = redis.RedisManager.DeleteArticleLike(articleID)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	err = tx.Commit().Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return nil
+}
+
+// 좋아요 유저와 summary 같이 삭제
+func (repo *articleLikeRepository) DeleteWithTransaction(db *gorm.DB, articleID, userID int64) error {
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
+	defer cancel()
+
+	tx := db.WithContext(ctx).Begin()
+
+	err := repo.Delete(tx, articleID, userID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = NewArticleLikeCountRepository().Decrease(tx, articleID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// 캐시에 설정하는게 실패 했다면 에러가 아닌 키를 삭제
+	err = redis.RedisManager.DecreaseArticleLike(articleID)
+	if err != nil {
+		// 캐시 삭제도 에러가 발생하면 rollback
+		err = redis.RedisManager.DeleteArticleLike(articleID)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	err = tx.Commit().Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return nil
 }

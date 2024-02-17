@@ -1,11 +1,15 @@
 package router
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"github.com/hotkimho/realworld-api/controller/follow"
+	"github.com/sirupsen/logrus"
+	"io"
 	"net/http"
 	"strings"
+	"time"
 
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/golang-jwt/jwt/v5"
@@ -51,49 +55,55 @@ func (m *Router) Init() {
 				Method:      "POST",
 				Path:        "/user/signup",
 				HandlerFunc: auth.SignUp,
+				Middleware:  []Middleware{LoggingMiddleware},
 			},
 			{
 				Method:      "POST",
 				Path:        "/user/signin",
 				HandlerFunc: auth.SignIn,
+				Middleware:  []Middleware{LoggingMiddleware},
 			},
 			{
 				Method:      "GET",
 				Path:        "/heartbeat",
 				HandlerFunc: auth.Heartbeat,
+				Middleware:  []Middleware{LoggingMiddleware},
 			},
 			{
 				Method:      "GET",
 				Path:        "/my/profile",
 				HandlerFunc: user.ReadMyProfile,
-				Middleware:  []Middleware{UserAuthMiddleware},
+				Middleware:  []Middleware{LoggingMiddleware, UserAuthMiddleware},
 			},
 			{
 				Method:      "GET",
 				Path:        "/user/{user_id}/profile",
 				HandlerFunc: user.ReadUserProfile,
-				Middleware:  []Middleware{UserAuthMiddlewareWithoutVerify},
+				Middleware:  []Middleware{LoggingMiddleware, UserAuthMiddlewareWithoutVerify},
 			},
 			{
 				Method:      "PUT",
 				Path:        "/my/profile",
 				HandlerFunc: user.UpdateUserProfile,
-				Middleware:  []Middleware{UserAuthMiddleware},
+				Middleware:  []Middleware{LoggingMiddleware, UserAuthMiddleware},
 			},
 			{
 				Method:      "GET",
 				Path:        "/token-refresh",
 				HandlerFunc: auth.RefreshToken,
+				Middleware:  []Middleware{LoggingMiddleware},
 			},
 			{
 				Method:      "POST",
 				Path:        "/user/verify-email",
 				HandlerFunc: auth.VerifyEmail,
+				Middleware:  []Middleware{LoggingMiddleware},
 			},
 			{
 				Method:      "POST",
 				Path:        "/user/verify-username",
 				HandlerFunc: auth.VerifyUsername,
+				Middleware:  []Middleware{LoggingMiddleware},
 			},
 		},
 	})
@@ -105,60 +115,61 @@ var ArticleRouter = [][]*Route{
 			Method:      "POST",
 			Path:        "/article",
 			HandlerFunc: article.CreateArticle,
-			Middleware:  []Middleware{UserAuthMiddleware},
+			Middleware:  []Middleware{LoggingMiddleware, UserAuthMiddleware},
 		},
 		{
 			Method:      "GET",
 			Path:        "/user/{author_id}/article/{article_id}",
 			HandlerFunc: article.ReadArticleByID,
-			Middleware:  []Middleware{UserAuthMiddlewareWithoutVerify},
+			Middleware:  []Middleware{LoggingMiddleware, UserAuthMiddlewareWithoutVerify},
 		},
 		{
 			Method:      "PUT",
 			Path:        "/article/{article_id}",
 			HandlerFunc: article.UpdateArticle,
-			Middleware:  []Middleware{UserAuthMiddleware},
+			Middleware:  []Middleware{LoggingMiddleware, UserAuthMiddleware},
 		},
 		{
 			Method:      "DELETE",
 			Path:        "/article/{article_id}",
 			HandlerFunc: article.DeleteArticle,
-			Middleware:  []Middleware{UserAuthMiddleware},
+			Middleware:  []Middleware{LoggingMiddleware, UserAuthMiddleware},
 		},
 		{
 			Method:      "GET",
 			Path:        "/articles",
 			HandlerFunc: article.ReadArticleByOffset,
-			Middleware:  []Middleware{UserAuthMiddlewareWithoutVerify},
+			Middleware:  []Middleware{LoggingMiddleware, UserAuthMiddlewareWithoutVerify},
 		},
 		{
 			Method:      "GET",
 			Path:        "/my/articles",
 			HandlerFunc: article.ReadMyArticleByOffset,
-			Middleware:  []Middleware{UserAuthMiddleware},
+			Middleware:  []Middleware{LoggingMiddleware, UserAuthMiddleware},
 		},
 		{
 			Method:      "GET",
 			Path:        "/articles/tag",
 			HandlerFunc: article.ReadArticleByTag,
+			Middleware:  []Middleware{LoggingMiddleware},
 		},
 		{
 			Method:      "POST",
 			Path:        "/user/{author_id}/article/{article_id}/like",
 			HandlerFunc: article.CreateArticleLike,
-			Middleware:  []Middleware{UserAuthMiddleware},
+			Middleware:  []Middleware{LoggingMiddleware, UserAuthMiddleware},
 		},
 		{
 			Method:      "DELETE",
 			Path:        "/user/{author_id}/article/{article_id}/like",
 			HandlerFunc: article.DeleteArticleLike,
-			Middleware:  []Middleware{UserAuthMiddleware},
+			Middleware:  []Middleware{LoggingMiddleware, UserAuthMiddleware},
 		},
 		{
 			Method:      "GET",
 			Path:        "/user/{author_id}/articles",
 			HandlerFunc: article.ReadArticlesByUserID,
-			Middleware:  []Middleware{UserAuthMiddlewareWithoutVerify},
+			Middleware:  []Middleware{LoggingMiddleware, UserAuthMiddlewareWithoutVerify},
 		},
 	},
 }
@@ -169,24 +180,25 @@ var CommentRouter = [][]*Route{
 			Method:      "POST",
 			Path:        "/user/{author_id}/article/{article_id}/comment",
 			HandlerFunc: comment.CreateComment,
-			Middleware:  []Middleware{UserAuthMiddleware},
+			Middleware:  []Middleware{LoggingMiddleware, UserAuthMiddleware},
 		},
 		{
 			Method:      "GET",
 			Path:        "/user/{author_id}/article/{article_id}/comments",
 			HandlerFunc: comment.ReadComments,
+			Middleware:  []Middleware{LoggingMiddleware},
 		},
 		{
 			Method:      "PUT",
 			Path:        "/user/{author_id}/article/{article_id}/comment/{comment_id}",
 			HandlerFunc: comment.UpdateComment,
-			Middleware:  []Middleware{UserAuthMiddleware},
+			Middleware:  []Middleware{LoggingMiddleware, UserAuthMiddleware},
 		},
 		{
 			Method:      "DELETE",
 			Path:        "/user/{author_id}/article/{article_id}/comment/{comment_id}",
 			HandlerFunc: comment.DeleteComment,
-			Middleware:  []Middleware{UserAuthMiddleware},
+			Middleware:  []Middleware{LoggingMiddleware, UserAuthMiddleware},
 		},
 	},
 }
@@ -197,13 +209,13 @@ var FollowRouter = [][]*Route{
 			Method:      "POST",
 			Path:        "/user/follow/{followed_id}",
 			HandlerFunc: follow.CreateFollow,
-			Middleware:  []Middleware{UserAuthMiddleware},
+			Middleware:  []Middleware{LoggingMiddleware, UserAuthMiddleware},
 		},
 		{
 			Method:      "DELETE",
 			Path:        "/user/follow/{followed_id}",
 			HandlerFunc: follow.DeleteFollow,
-			Middleware:  []Middleware{UserAuthMiddleware},
+			Middleware:  []Middleware{LoggingMiddleware, UserAuthMiddleware},
 		},
 	},
 }
@@ -278,9 +290,35 @@ type Route struct {
 func LoggingMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		// todo : logging
+		start := time.Now()
 
-		next(w, r)
+		// 요청 본문 로깅을 위해 Body를 읽고 복사
+		var bodyBytes []byte
+		if r.Body != nil {
+			bodyBytes, _ = io.ReadAll(r.Body) // 수정됨
+		}
+		// Body 내용을 복사한 후 원본 요청에 다시 쓰기
+		r.Body = io.NopCloser(bytes.NewBuffer(bodyBytes)) // 수정됨
+
+		// 요청 처리 전 로깅
+		logrus.WithFields(logrus.Fields{
+			"domain":   r.Host,
+			"path":     r.URL.Path,
+			"method":   r.Method,
+			"body":     string(bodyBytes),
+			"query":    r.URL.Query(),
+			"clientIP": r.RemoteAddr,
+		}).Info("Request received")
+		logrus.Trace("Trace log")
+
+		next.ServeHTTP(w, r)
+
+		// 요청 처리 후 로깅 (예: 응답 시간)
+		logrus.WithFields(logrus.Fields{
+			"path":         r.URL.Path,
+			"method":       r.Method,
+			"responseTime": time.Since(start).String(),
+		}).Info("Request processed")
 	}
 }
 

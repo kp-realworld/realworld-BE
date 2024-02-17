@@ -22,7 +22,7 @@ type CreateArticleResponseDTO struct {
 	Title         string        `json:"title"`
 	Description   string        `json:"description"`
 	Body          string        `json:"body"`
-	FavoriteCount int           `json:"favorite_count"`
+	FavoriteCount int64         `json:"favorite_count"`
 	TagList       []string      `json:"tag_list,omitempty"`
 	IsFavorited   bool          `json:"is_favorited"`
 	Author        ArticleAuthor `json:"author"`
@@ -38,7 +38,7 @@ type ReadArticleResponseDTO struct {
 	Title         string        `json:"title"`
 	Description   string        `json:"description"`
 	Body          string        `json:"body"`
-	FavoriteCount int           `json:"favorite_count"`
+	FavoriteCount int64         `json:"favorite_count"`
 	TagList       []string      `json:"tag_list,omitempty"`
 	IsFavorited   bool          `json:"is_favorited"`
 	Author        ArticleAuthor `json:"author"`
@@ -70,7 +70,7 @@ type UpdateArticleResponseDTO struct {
 	Title         string        `json:"title"`
 	Description   string        `json:"description"`
 	Body          string        `json:"body"`
-	FavoriteCount int           `json:"favorite_count"`
+	FavoriteCount int64         `json:"favorite_count"`
 	TagList       []string      `json:"tag_list,omitempty"`
 	IsFavorited   bool          `json:"is_favorited"`
 	Author        ArticleAuthor `json:"author"`

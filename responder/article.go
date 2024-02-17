@@ -2,6 +2,7 @@ package responder
 
 import (
 	"encoding/json"
+	"github.com/hotkimho/realworld-api/redis"
 	"net/http"
 
 	"github.com/hotkimho/realworld-api/models"
@@ -85,7 +86,13 @@ func ReadArticleByIDResponse(w http.ResponseWriter, article models.Article, isFo
 	w.Write(jsonData)
 }
 
-func ReadArticleByOffsetResponse(w http.ResponseWriter, articles []models.Article) {
+func ReadArticleByOffsetResponse(w http.ResponseWriter, articles []models.Article, articleLikeCounts []models.ArticleLikeCount) {
+
+	articleLikeMap := make(map[int64]int64)
+
+	for _, articleCount := range articleLikeCounts {
+		articleLikeMap[articleCount.ArticleID] = articleCount.Count
+	}
 
 	articleList := make([]articledto.ReadArticleResponseDTO, 0)
 
@@ -101,12 +108,17 @@ func ReadArticleByOffsetResponse(w http.ResponseWriter, articles []models.Articl
 			tagList = append(tagList, tag.Tag)
 		}
 
+		var likeCount int64
+		if count, ok := articleLikeMap[article.ID]; ok {
+			likeCount = count
+		}
+
 		articleList = append(articleList, articledto.ReadArticleResponseDTO{
 			ID:            article.ID,
 			Title:         article.Title,
 			Description:   article.Body,
 			Body:          article.Body,
-			FavoriteCount: article.FavoriteCount,
+			FavoriteCount: likeCount,
 			IsFavorited:   isLiked,
 			TagList:       tagList,
 			CreatedAt:     article.CreatedAt,
@@ -235,13 +247,18 @@ func CreateArticleLikeResponse(w http.ResponseWriter, code int, article models.A
 		tagList = append(tagList, tag.Tag)
 	}
 
+	likecount, err := redis.RedisManager.GetArticleLike(article.ID)
+	if err != nil {
+		likecount = 0
+	}
+
 	wrapper := articledto.CreateArticleLikeResponseWrapperDTO{
 		Article: articledto.CreateArticleLikeResponseDTO{
 			ID:            article.ID,
 			Title:         article.Title,
 			Description:   article.Body,
 			Body:          article.Body,
-			FavoriteCount: article.FavoriteCount,
+			FavoriteCount: likecount,
 			IsFavorited:   isLiked,
 			TagList:       tagList,
 			CreatedAt:     article.CreatedAt,

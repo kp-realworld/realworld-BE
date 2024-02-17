@@ -7,7 +7,6 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/hotkimho/realworld-api/env"
-	"github.com/hotkimho/realworld-api/models"
 )
 
 var DB *gorm.DB
@@ -18,6 +17,7 @@ var ArticleTagRepo *articleTagRepository
 var ArticleLikeRepo *articleLikeRepository
 var CommentRepo *commentRepository
 var FollowRepo *followRepository
+var ArticleLikeCountRepo *articleLikeCountRepository
 
 func Init() error {
 
@@ -42,17 +42,18 @@ func Init() error {
 	// Init Repositories
 	initRepositories()
 	// models.Article{}, models.ArticleTag{}, models.ArticleLike{}
-	err = DB.AutoMigrate(
-		models.User{},
-		models.Article{},
-		models.ArticleTag{},
-		models.ArticleLike{},
-		models.Comment{},
-		models.Follow{},
-	)
-	if err != nil {
-		return err
-	}
+	//err = DB.AutoMigrate(
+	//	models.User{},
+	//	models.Article{},
+	//	models.ArticleTag{},
+	//	models.ArticleLike{},
+	//	models.Comment{},
+	//	models.Follow{},
+	//	models.ArticleLikeCount{},
+	//)
+	//if err != nil {
+	//	return err
+	//}
 
 	return nil
 }
@@ -68,4 +69,5 @@ func initRepositories() {
 	ArticleLikeRepo = NewArticleLikeRepository()
 	CommentRepo = NewCommentRepository()
 	FollowRepo = NewFollowRepository()
+	ArticleLikeCountRepo = NewArticleLikeCountRepository()
 }
