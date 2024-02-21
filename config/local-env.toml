@@ -4,7 +4,7 @@ Name = "realworld-dev"
 Host = "realworld.cz9z95hgjl9q.ap-northeast-2.rds.amazonaws.com"
 Port = 3306
 User = "root"
-Password = ""
+Password = "!Gktrlagh33"
 
 [redis]
 Host = "localhost"

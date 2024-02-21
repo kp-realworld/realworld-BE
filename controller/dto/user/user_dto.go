@@ -1,24 +1,24 @@
 package userdto
 
 type ReadMyProfileResponseDTO struct {
-	Username     string  `json:"username"`
+	Username     string  `validate:"required" json:"username"`
 	Bio          *string `json:"bio,omitempty"`
-	ProfileImage string  `json:"profile_image"`
+	ProfileImage string  `validate:"required" json:"profile_image"`
 }
 
 type ReadMyProfileResponseWrapperDTO struct {
-	User ReadMyProfileResponseDTO `json:"user"`
+	User ReadMyProfileResponseDTO `validate:"required" json:"user"`
 }
 
 type ReadUserProfileResponseDTO struct {
-	Username     string  `json:"username"`
+	Username     string  `validate:"required" json:"username"`
 	Bio          *string `json:"bio,omitempty"`
-	ProfileImage string  `json:"profile_image"`
+	ProfileImage string  `validate:"required" json:"profile_image"`
 	Following    *bool   `json:"following"`
 }
 
 type ReadUserProfileResponseWrapperDTO struct {
-	User ReadUserProfileResponseDTO `json:"user"`
+	User ReadUserProfileResponseDTO `validate:"required" json:"user"`
 }
 
 type UpdateUserProfileRequestDTO struct {
@@ -34,11 +34,11 @@ func (dtd *UpdateUserProfileRequestDTO) IsEmpty() bool {
 }
 
 type UpdateUserProfileResponseDTO struct {
-	Username     string  `json:"username"`
+	Username     string  `validate:"required" json:"username"`
 	Bio          *string `json:"bio,omitempty"`
-	ProfileImage string  `json:"profile_image"`
+	ProfileImage string  `validate:"required" json:"profile_image"`
 }
 
 type UpdateUserProfileResponseWrapperDTO struct {
-	User UpdateUserProfileResponseDTO `json:"user"`
+	User UpdateUserProfileResponseDTO `validate:"required" json:"user"`
 }

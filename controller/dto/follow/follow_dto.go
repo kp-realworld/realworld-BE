@@ -1,23 +1,23 @@
 package followdto
 
 type CreateFollowResponseDTO struct {
-	Username     string  `json:"username"`
+	Username     string  `validate:"required" json:"username"`
 	Bio          *string `json:"bio,omitempty"`
-	ProfileImage string  `json:"profile_image"`
-	Following    bool    `json:"following"`
+	ProfileImage string  `validate:"required" json:"profile_image"`
+	Following    bool    `validate:"required" json:"following"`
 }
 
 type CreateFollowResponseWrapperDTO struct {
-	Profile CreateFollowResponseDTO `json:"user"`
+	Profile CreateFollowResponseDTO `validate:"required" json:"user"`
 }
 
 type DeleteFollowResponseDTO struct {
-	Username     string  `json:"username"`
+	Username     string  `validate:"required" json:"username"`
 	Bio          *string `json:"bio,omitempty"`
-	ProfileImage string  `json:"profile_image"`
-	Following    bool    `json:"following"`
+	ProfileImage string  `validate:"required" json:"profile_image"`
+	Following    bool    `validate:"required" json:"following"`
 }
 
 type DeleteFollowResponseWrapperDTO struct {
-	Profile DeleteFollowResponseDTO `json:"user"`
+	Profile DeleteFollowResponseDTO `validate:"required" json:"user"`
 }

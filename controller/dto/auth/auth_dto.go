@@ -8,13 +8,13 @@ type SignUpRequestDTO struct {
 }
 
 type SignUpResponseDTO struct {
-	UserID   int64  `json:"user_id,omitempty"`
-	Username string `json:"username,omitempty"`
-	Email    string `json:"email,omitempty"`
+	UserID   int64  `validate:"required" json:"user_id,omitempty"`
+	Username string `validate:"required" json:"username,omitempty"`
+	Email    string `validate:"required" json:"email,omitempty"`
 }
 
 type SignUpResponseWrapperDTO struct {
-	User SignUpResponseDTO `json:"user"`
+	User SignUpResponseDTO `validate:"required" json:"user"`
 }
 
 // 로그인
@@ -24,19 +24,19 @@ type SignInRequestDTO struct {
 }
 
 type SignInResponseDTO struct {
-	UserID       int64  `json:"user_id,omitempty"`
-	Username     string `json:"username,omitempty"`
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
+	UserID       int64  `validate:"required" json:"user_id,omitempty"`
+	Username     string `validate:"required" json:"username,omitempty"`
+	AccessToken  string `validate:"required" json:"access_token"`
+	RefreshToken string `validate:"required" json:"refresh_token"`
 }
 
 type SignInResponseWrapperDTO struct {
-	User SignInResponseDTO `json:"user"`
+	User SignInResponseDTO `validate:"required" json:"user"`
 }
 
 // 토큰 갱신
 type RefreshTokenResponseDTO struct {
-	Token string `json:"token"`
+	Token string `validate:"required" json:"token"`
 }
 
 // username 확인
@@ -45,7 +45,7 @@ type VerifyUsernameRequestDTO struct {
 }
 
 type VerifyUsernameResponseDTO struct {
-	Username string `json:"username,omitempty"`
+	Username string `validate:"required" json:"username,omitempty"`
 }
 
 // email 확인
@@ -54,5 +54,5 @@ type VerifyEmailRequestDTO struct {
 }
 
 type VerifyEmailResponseDTO struct {
-	Email string `json:"email,omitempty"`
+	Email string `validate:"required" json:"email,omitempty"`
 }
