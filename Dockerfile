@@ -11,7 +11,11 @@ RUN go build -o realworld -ldflags="-s -w"
 
 FROM alpine
 
-COPY --from=builder /app ./realworld
+RUN apk add --no-cache tzdata
+ENV TZ=Asia/Seoul
+
+COPY --from=builder /app ./
+#COPY /app/config ./
 
 EXPOSE 8080
 
