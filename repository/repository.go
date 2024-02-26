@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/hotkimho/realworld-api/env"
+	"github.com/hotkimho/realworld-api/models"
 )
 
 var DB *gorm.DB
@@ -42,18 +43,18 @@ func Init() error {
 	// Init Repositories
 	initRepositories()
 	// models.Article{}, models.ArticleTag{}, models.ArticleLike{}
-	//err = DB.AutoMigrate(
-	//	models.User{},
-	//	models.Article{},
-	//	models.ArticleTag{},
-	//	models.ArticleLike{},
-	//	models.Comment{},
-	//	models.Follow{},
-	//	models.ArticleLikeCount{},
-	//)
-	//if err != nil {
-	//	return err
-	//}
+	err = DB.AutoMigrate(
+		models.User{},
+		models.Article{},
+		models.ArticleTag{},
+		models.ArticleLike{},
+		models.Comment{},
+		models.Follow{},
+		models.ArticleLikeCount{},
+	)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

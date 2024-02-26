@@ -327,9 +327,9 @@
                 }
             }
         },
-        "/my/profile": {
+        "/profile": {
             "get": {
-                "description": "내 프로필 조회",
+                "description": "Read user profile",
                 "consumes": [
                     "application/json"
                 ],
@@ -339,25 +339,37 @@
                 "tags": [
                     "Profile tag"
                 ],
-                "summary": "내 프로필 조회",
+                "summary": "Read user profile",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "username",
+                        "name": "username",
+                        "in": "query",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "jwt token",
                         "name": "authorization",
-                        "in": "header",
-                        "required": true
+                        "in": "header"
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "success",
                         "schema": {
-                            "$ref": "#/definitions/userdto.ReadMyProfileResponseDTO"
+                            "$ref": "#/definitions/userdto.ReadUserProfileResponseWrapperDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "bad request",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
                         }
                     },
                     "404": {
-                        "description": "user 정보가 없는 경우",
+                        "description": "user not found",
                         "schema": {
                             "$ref": "#/definitions/types.ErrorResponse"
                         }
@@ -385,10 +397,16 @@
                 "parameters": [
                     {
                         "type": "string",
+                        "description": "username",
+                        "name": "username",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
                         "description": "jwt token",
                         "name": "authorization",
-                        "in": "header",
-                        "required": true
+                        "in": "header"
                     },
                     {
                         "description": "updateUserProfileReq",
@@ -1118,6 +1136,65 @@
                         }
                     }
                 }
+            },
+            "delete": {
+                "description": "Article unlike",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Article tag"
+                ],
+                "summary": "Article unlike",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "article 작성자 ID",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "article id",
+                        "name": "article_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "success"
+                    },
+                    "400": {
+                        "description": "user_id, article id가 유효하지 않음",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "기사를 찾지 못한 경우",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "network error",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    }
+                }
             }
         },
         "/user/{author_id}/articles": {
@@ -1314,124 +1391,6 @@
                     },
                     "500": {
                         "description": "네트워크 에러",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/user/{user_id}/article/{article_id}/like": {
-            "delete": {
-                "description": "Article unlike",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Article tag"
-                ],
-                "summary": "Article unlike",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "jwt token",
-                        "name": "authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "article 작성자 ID",
-                        "name": "user_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "article id",
-                        "name": "article_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "success"
-                    },
-                    "400": {
-                        "description": "user_id, article id가 유효하지 않음",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "기사를 찾지 못한 경우",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "network error",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/user/{user_id}/profile": {
-            "get": {
-                "description": "Read user profile",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Profile tag"
-                ],
-                "summary": "Read user profile",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "user_id",
-                        "name": "user_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "jwt token",
-                        "name": "authorization",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "success",
-                        "schema": {
-                            "$ref": "#/definitions/userdto.ReadUserProfileResponseWrapperDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "bad request",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "user not found",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "network error",
                         "schema": {
                             "$ref": "#/definitions/types.ErrorResponse"
                         }
@@ -1990,20 +1949,6 @@
             "properties": {
                 "error": {
                     "$ref": "#/definitions/types.ErrorDetail"
-                }
-            }
-        },
-        "userdto.ReadMyProfileResponseDTO": {
-            "type": "object",
-            "properties": {
-                "bio": {
-                    "type": "string"
-                },
-                "profile_image": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
                 }
             }
         },
