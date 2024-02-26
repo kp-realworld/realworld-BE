@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/hotkimho/realworld-api/controller/follow"
-	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/sirupsen/logrus"
+
+	"github.com/hotkimho/realworld-api/controller/follow"
 
 	sentryhttp "github.com/getsentry/sentry-go/http"
 	"github.com/golang-jwt/jwt/v5"
@@ -69,21 +71,21 @@ func (m *Router) Init() {
 				HandlerFunc: auth.Heartbeat,
 				Middleware:  []Middleware{LoggingMiddleware},
 			},
+			//{
+			//	Method:      "GET",
+			//	Path:        "/my/profile",
+			//	HandlerFunc: user.ReadMyProfile,
+			//	Middleware:  []Middleware{LoggingMiddleware, UserAuthMiddleware},
+			//},
 			{
 				Method:      "GET",
-				Path:        "/my/profile",
-				HandlerFunc: user.ReadMyProfile,
-				Middleware:  []Middleware{LoggingMiddleware, UserAuthMiddleware},
-			},
-			{
-				Method:      "GET",
-				Path:        "/user/{user_id}/profile",
+				Path:        "/profile",
 				HandlerFunc: user.ReadUserProfile,
 				Middleware:  []Middleware{LoggingMiddleware, UserAuthMiddlewareWithoutVerify},
 			},
 			{
 				Method:      "PUT",
-				Path:        "/my/profile",
+				Path:        "/profile",
 				HandlerFunc: user.UpdateUserProfile,
 				Middleware:  []Middleware{LoggingMiddleware, UserAuthMiddleware},
 			},

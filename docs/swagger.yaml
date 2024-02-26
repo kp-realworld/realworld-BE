@@ -357,15 +357,6 @@ definitions:
       error:
         $ref: '#/definitions/types.ErrorDetail'
     type: object
-  userdto.ReadMyProfileResponseDTO:
-    properties:
-      bio:
-        type: string
-      profile_image:
-        type: string
-      username:
-        type: string
-    type: object
   userdto.ReadUserProfileResponseDTO:
     properties:
       bio:
@@ -628,16 +619,20 @@ paths:
       summary: Read my article by offset
       tags:
       - Article tag
-  /my/profile:
+  /profile:
     get:
       consumes:
       - application/json
-      description: 내 프로필 조회
+      description: Read user profile
       parameters:
+      - description: username
+        in: query
+        name: username
+        required: true
+        type: string
       - description: jwt token
         in: header
         name: authorization
-        required: true
         type: string
       produces:
       - application/json
@@ -645,16 +640,20 @@ paths:
         "200":
           description: success
           schema:
-            $ref: '#/definitions/userdto.ReadMyProfileResponseDTO'
+            $ref: '#/definitions/userdto.ReadUserProfileResponseWrapperDTO'
+        "400":
+          description: bad request
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
         "404":
-          description: user 정보가 없는 경우
+          description: user not found
           schema:
             $ref: '#/definitions/types.ErrorResponse'
         "500":
           description: network error
           schema:
             $ref: '#/definitions/types.ErrorResponse'
-      summary: 내 프로필 조회
+      summary: Read user profile
       tags:
       - Profile tag
     put:
@@ -662,10 +661,14 @@ paths:
       - application/json
       description: Update user profile
       parameters:
+      - description: username
+        in: query
+        name: username
+        required: true
+        type: string
       - description: jwt token
         in: header
         name: authorization
-        required: true
         type: string
       - description: updateUserProfileReq
         in: body
@@ -898,6 +901,46 @@ paths:
       tags:
       - Comment tag
   /user/{author_id}/article/{article_id}/like:
+    delete:
+      consumes:
+      - application/json
+      description: Article unlike
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: article 작성자 ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      - description: article id
+        in: path
+        name: article_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: success
+        "400":
+          description: user_id, article id가 유효하지 않음
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+        "404":
+          description: 기사를 찾지 못한 경우
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+        "500":
+          description: network error
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: Article unlike
+      tags:
+      - Article tag
     post:
       consumes:
       - application/json
@@ -1078,85 +1121,6 @@ paths:
       summary: 댓글 수정
       tags:
       - Comment tag
-  /user/{user_id}/article/{article_id}/like:
-    delete:
-      consumes:
-      - application/json
-      description: Article unlike
-      parameters:
-      - description: jwt token
-        in: header
-        name: authorization
-        required: true
-        type: string
-      - description: article 작성자 ID
-        in: path
-        name: user_id
-        required: true
-        type: integer
-      - description: article id
-        in: path
-        name: article_id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: success
-        "400":
-          description: user_id, article id가 유효하지 않음
-          schema:
-            $ref: '#/definitions/types.ErrorResponse'
-        "404":
-          description: 기사를 찾지 못한 경우
-          schema:
-            $ref: '#/definitions/types.ErrorResponse'
-        "500":
-          description: network error
-          schema:
-            $ref: '#/definitions/types.ErrorResponse'
-      summary: Article unlike
-      tags:
-      - Article tag
-  /user/{user_id}/profile:
-    get:
-      consumes:
-      - application/json
-      description: Read user profile
-      parameters:
-      - description: user_id
-        in: path
-        name: user_id
-        required: true
-        type: integer
-      - description: jwt token
-        in: header
-        name: authorization
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: success
-          schema:
-            $ref: '#/definitions/userdto.ReadUserProfileResponseWrapperDTO'
-        "400":
-          description: bad request
-          schema:
-            $ref: '#/definitions/types.ErrorResponse'
-        "404":
-          description: user not found
-          schema:
-            $ref: '#/definitions/types.ErrorResponse'
-        "500":
-          description: network error
-          schema:
-            $ref: '#/definitions/types.ErrorResponse'
-      summary: Read user profile
-      tags:
-      - Profile tag
   /user/follow/{followed_id}:
     delete:
       consumes:
