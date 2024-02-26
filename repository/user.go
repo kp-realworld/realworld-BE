@@ -3,8 +3,9 @@ package repository
 import (
 	"context"
 	"errors"
-	"github.com/hotkimho/realworld-api/types"
 	"time"
+
+	"github.com/hotkimho/realworld-api/types"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -118,6 +119,46 @@ func (repo *userRepository) UpdateUserProfileByID(db *gorm.DB, updateRequest use
 	}
 
 	err := db.WithContext(ctx).Model(&models.User{UserID: id}).Updates(updateData).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func (repo *userRepository) UpdateUserProfileByUsernameAndUserID(db *gorm.DB, updateRequest userdto.UpdateUserProfileRequestDTO, username string, password *string, userID int64) (*models.User, error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
+	defer cancel()
+
+	var user models.User
+
+	updateData := map[string]interface{}{}
+
+	if updateRequest.Username != nil {
+		updateData["username"] = *updateRequest.Username
+	}
+	if updateRequest.Bio != nil {
+		updateData["bio"] = *updateRequest.Bio
+	}
+	if updateRequest.ProfileImage != nil {
+		updateData["profile_image"] = *updateRequest.ProfileImage
+	}
+	if updateRequest.Email != nil {
+		updateData["email"] = *updateRequest.Email
+	}
+	if password != nil {
+		updateData["password"] = password
+	}
+
+	err := db.WithContext(ctx).Model(models.User{}).
+		Where(
+			&models.User{
+				Username: username,
+				UserID:   userID,
+			}).
+		Updates(updateData).
+		First(&user).Error
 	if err != nil {
 		return nil, err
 	}
