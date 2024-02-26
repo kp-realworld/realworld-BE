@@ -28,6 +28,6 @@ sudo docker build -t realworld-api .
 
 # 새로운 컨테이너 실행
 echo "Running new container..."
-sudo docker run -d -p 8080:8080 --name ${CONTAINER_NAME} realworld-api
+sudo docker run --network="host" -d -p 8080:8080 --name ${CONTAINER_NAME} realworld-api
 
 echo "Container ${CONTAINER_NAME} is running."
