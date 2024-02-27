@@ -21,7 +21,7 @@ import (
 // @Failure 400 {object} types.ErrorResponse "입력값이 유효하지 않음"
 // @Failure 422 {object} types.ErrorResponse "요청을 제대로 수행하지 못함"
 // @Failure 500 {object} types.ErrorResponse "네트워크 에러"
-// @Router /user/{user_id}/article [post]
+// @Router /article [post]
 func CreateArticle(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("ctx_user_id").(int64)
 

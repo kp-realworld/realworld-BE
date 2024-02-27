@@ -25,6 +25,65 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/article": {
+            "post": {
+                "description": "기사를 생성합니다.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Article tag"
+                ],
+                "summary": "기사 생성",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "jwt token",
+                        "name": "authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "기사 생성 내용",
+                        "name": "createArticleReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/articledto.CreateArticleRequestDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "정상적으로 생성됨",
+                        "schema": {
+                            "$ref": "#/definitions/articledto.CreateArticleResponseWrapperDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "입력값이 유효하지 않음",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "요청을 제대로 수행하지 못함",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "네트워크 에러",
+                        "schema": {
+                            "$ref": "#/definitions/types.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/article/{article_id}": {
             "put": {
                 "description": "Update article",
@@ -1259,65 +1318,6 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "network error",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/user/{user_id}/article": {
-            "post": {
-                "description": "기사를 생성합니다.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Article tag"
-                ],
-                "summary": "기사 생성",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "jwt token",
-                        "name": "authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "description": "기사 생성 내용",
-                        "name": "createArticleReq",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/articledto.CreateArticleRequestDTO"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "정상적으로 생성됨",
-                        "schema": {
-                            "$ref": "#/definitions/articledto.CreateArticleResponseWrapperDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "입력값이 유효하지 않음",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    },
-                    "422": {
-                        "description": "요청을 제대로 수행하지 못함",
-                        "schema": {
-                            "$ref": "#/definitions/types.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "네트워크 에러",
                         "schema": {
                             "$ref": "#/definitions/types.ErrorResponse"
                         }

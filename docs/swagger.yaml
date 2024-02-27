@@ -414,6 +414,45 @@ info:
   title: Swagger Example API
   version: "1.0"
 paths:
+  /article:
+    post:
+      consumes:
+      - application/json
+      description: 기사를 생성합니다.
+      parameters:
+      - description: jwt token
+        in: header
+        name: authorization
+        required: true
+        type: string
+      - description: 기사 생성 내용
+        in: body
+        name: createArticleReq
+        required: true
+        schema:
+          $ref: '#/definitions/articledto.CreateArticleRequestDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: 정상적으로 생성됨
+          schema:
+            $ref: '#/definitions/articledto.CreateArticleResponseWrapperDTO'
+        "400":
+          description: 입력값이 유효하지 않음
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+        "422":
+          description: 요청을 제대로 수행하지 못함
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+        "500":
+          description: 네트워크 에러
+          schema:
+            $ref: '#/definitions/types.ErrorResponse'
+      summary: 기사 생성
+      tags:
+      - Article tag
   /article/{article_id}:
     delete:
       consumes:
@@ -1026,45 +1065,6 @@ paths:
           schema:
             $ref: '#/definitions/types.ErrorResponse'
       summary: 유저가 작성한 article 조회
-      tags:
-      - Article tag
-  /user/{user_id}/article:
-    post:
-      consumes:
-      - application/json
-      description: 기사를 생성합니다.
-      parameters:
-      - description: jwt token
-        in: header
-        name: authorization
-        required: true
-        type: string
-      - description: 기사 생성 내용
-        in: body
-        name: createArticleReq
-        required: true
-        schema:
-          $ref: '#/definitions/articledto.CreateArticleRequestDTO'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: 정상적으로 생성됨
-          schema:
-            $ref: '#/definitions/articledto.CreateArticleResponseWrapperDTO'
-        "400":
-          description: 입력값이 유효하지 않음
-          schema:
-            $ref: '#/definitions/types.ErrorResponse'
-        "422":
-          description: 요청을 제대로 수행하지 못함
-          schema:
-            $ref: '#/definitions/types.ErrorResponse'
-        "500":
-          description: 네트워크 에러
-          schema:
-            $ref: '#/definitions/types.ErrorResponse'
-      summary: 기사 생성
       tags:
       - Article tag
   /user/{user_id}/article/{article_id}/comment/{comment_id}:
