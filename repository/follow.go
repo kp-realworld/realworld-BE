@@ -39,7 +39,9 @@ func (repo *followRepository) Delete(db *gorm.DB, followerID int64, followeeID i
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
-	err := db.WithContext(ctx).Where("follower_id = ? AND followee_id = ?", followerID, followeeID).Delete(&models.Follow{}).Error
+	// hard delete
+
+	err := db.Unscoped().WithContext(ctx).Where("follower_id = ? AND followee_id = ?", followerID, followeeID).Delete(&models.Follow{}).Error
 	if err != nil {
 		return err
 	}

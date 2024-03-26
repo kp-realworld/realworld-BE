@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"github.com/hotkimho/realworld-api/models"
 	"github.com/hotkimho/realworld-api/redis"
 	"github.com/hotkimho/realworld-api/types"
@@ -57,6 +58,7 @@ func (repo *articleLikeCountRepository) GetByArticle(db *gorm.DB, articleID int6
 	// read cache
 	likeCount, err := redis.RedisManager.GetArticleLike(articleID)
 	if err == nil {
+		fmt.Println("cache hit1")
 		return likeCount, nil
 	}
 
@@ -86,6 +88,7 @@ func (repo *articleLikeCountRepository) GetByArticle(db *gorm.DB, articleID int6
 		return 0, err
 	}
 
+	fmt.Println("cache hit2")
 	return articleLikeCountObj.Count, nil
 }
 
@@ -134,4 +137,28 @@ func (repo *articleLikeCountRepository) Decrease(db *gorm.DB, articleID int64) e
 	}
 
 	return nil
+}
+
+func (repo *articleLikeCountRepository) GetByArticlesWithRedis(db *gorm.DB, articleIDs []int64) ([]models.ArticleLikeCount, error) {
+	var result []models.ArticleLikeCount
+
+	// Redis에서 캐시된 값 조회
+	fmt.Println("read ids : ", articleIDs)
+	cachedCounts, missingIDs := redis.RedisManager.GetCachedArticleLikeCounts(articleIDs)
+	result = append(result, cachedCounts...)
+
+	fmt.Println("missing ids : ", missingIDs)
+	if len(missingIDs) == 0 {
+		return result, nil
+	}
+
+	// DB에서 누락된 articleIDs에 대한 데이터 조회
+	dbCounts, err := repo.GetByArticles(db, missingIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	// 결과 합치기
+	result = append(result, dbCounts...)
+	return result, nil
 }

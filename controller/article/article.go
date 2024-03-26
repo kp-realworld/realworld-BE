@@ -2,6 +2,7 @@ package article
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/hotkimho/realworld-api/controller/dto/article"
@@ -96,6 +97,7 @@ func ReadArticleByID(w http.ResponseWriter, r *http.Request) {
 
 	// 게시글 좋아요 조회
 	article.FavoriteCount, err = repository.ArticleLikeCountRepo.GetByArticle(repository.DB, article.ID)
+	fmt.Println("article.FavoriteCount : ", article.FavoriteCount)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
@@ -126,7 +128,8 @@ func ReadArticleByOffset(w http.ResponseWriter, r *http.Request) {
 		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
-
+	fmt.Println("page : ", page)
+	fmt.Println("limit : ", limit)
 	articles, err := repository.ArticleRepo.GetByOffset(repository.DB, page, limit, userID)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
@@ -138,7 +141,7 @@ func ReadArticleByOffset(w http.ResponseWriter, r *http.Request) {
 		articleIDSlice = append(articleIDSlice, article.ID)
 	}
 
-	articleLikeCounts, err := repository.ArticleLikeCountRepo.GetByArticles(repository.DB, articleIDSlice)
+	articleLikeCounts, err := repository.ArticleLikeCountRepo.GetByArticlesWithRedis(repository.DB, articleIDSlice)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
@@ -247,6 +250,7 @@ func DeleteArticle(w http.ResponseWriter, r *http.Request) {
 func ReadMyArticleByOffset(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("ctx_user_id").(int64)
 
+	fmt.Println("222jwioqejqiwoejqiowejqwioejiqowejiqowejiojiojio")
 	page, limit, err := util.GetOffsetAndLimit(r)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
