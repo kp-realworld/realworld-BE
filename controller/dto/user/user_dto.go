@@ -15,6 +15,7 @@ type ReadUserProfileResponseDTO struct {
 	Bio          *string `json:"bio,omitempty"`
 	ProfileImage string  `json:"profile_image"`
 	Following    *bool   `json:"following"`
+	Email        string  `json:"email"`
 }
 
 type ReadUserProfileResponseWrapperDTO struct {

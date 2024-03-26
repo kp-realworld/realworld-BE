@@ -48,9 +48,12 @@ func (repo *articleTagRepository) Update(db *gorm.DB, articleID int64, tagList [
 		return err
 	}
 
-	_, err = repo.Create(db, articleID, tagList)
-	if err != nil {
-		return err
+	if len(tagList) > 0 {
+		_, err = repo.Create(db, articleID, tagList)
+		if err != nil {
+			return err
+
+		}
 	}
 
 	return nil

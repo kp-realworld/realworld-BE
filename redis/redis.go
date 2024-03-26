@@ -3,6 +3,7 @@ package redis
 import (
 	"context"
 	"fmt"
+	"github.com/hotkimho/realworld-api/models"
 	"time"
 
 	"github.com/getsentry/sentry-go"
@@ -110,15 +111,17 @@ func (r *redisManager) DeleteArticleLike(articleId int64) error {
 func (r *redisManager) IncreaseArticleLike(articleId int64) error {
 	key := fmt.Sprintf("article:%d:like", articleId)
 
+	fmt.Println("increase key : ", key)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
-	_, err := r.redisClient.Incr(ctx, key).Result()
+	c, err := r.redisClient.Incr(ctx, key).Result()
 	if err != nil {
 		sentry.CaptureException(err)
 		return err
 	}
 
+	fmt.Println("increase count : ", c)
 	return nil
 }
 
@@ -135,4 +138,24 @@ func (r *redisManager) DecreaseArticleLike(articleId int64) error {
 	}
 
 	return nil
+}
+
+func (r *redisManager) GetCachedArticleLikeCounts(articleIDs []int64) ([]models.ArticleLikeCount, []int64) {
+	var cachedCounts []models.ArticleLikeCount
+	var missingIDs []int64
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	// 각 articleID에 대해 Redis 조회
+	for _, articleID := range articleIDs {
+		val, err := r.redisClient.Get(ctx, fmt.Sprintf("ㄷ%d:like", articleID)).Int64()
+		if err == redis.Nil {
+			missingIDs = append(missingIDs, articleID)
+		} else if err == nil {
+			cachedCounts = append(cachedCounts, models.ArticleLikeCount{ArticleID: articleID, Count: val})
+		}
+	}
+
+	return cachedCounts, missingIDs
 }
