@@ -102,7 +102,7 @@ func ReadArticleByOffsetResponse(w http.ResponseWriter, articles []models.Articl
 		if len(article.Likes) > 0 {
 			isLiked = true
 		}
-
+		
 		tagList := make([]string, 0)
 		for _, tag := range article.Tags {
 			tagList = append(tagList, tag.Tag)

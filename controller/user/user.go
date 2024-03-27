@@ -2,6 +2,7 @@ package user
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/hotkimho/realworld-api/controller/auth"
@@ -58,6 +59,7 @@ func ReadUserProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println("username: ", username)
 	user, err := repository.UserRepo.GetByUsername(repository.DB, username)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
@@ -95,11 +97,6 @@ func ReadUserProfile(w http.ResponseWriter, r *http.Request) {
 // @Router /profile [put]
 func UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
 	ctxUserID := r.Context().Value("ctx_user_id").(int64)
-	username := r.URL.Query().Get("username")
-	if username == "" {
-		responder.ErrorResponse(w, http.StatusBadRequest, "invalid username")
-		return
-	}
 
 	var updateUserProfileReq userdto.UpdateUserProfileRequestDTO
 
@@ -111,6 +108,11 @@ func UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
 
 	if updateUserProfileReq.IsEmpty() {
 		responder.ErrorResponse(w, http.StatusBadRequest, "invalid request")
+		return
+	}
+
+	if updateUserProfileReq.Username == nil || *updateUserProfileReq.Username == "" {
+		responder.ErrorResponse(w, http.StatusBadRequest, "invalid username")
 		return
 	}
 
@@ -129,7 +131,7 @@ func UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
 		password = &hashedPass
 	}
 
-	user, err := repository.UserRepo.UpdateUserProfileByUsernameAndUserID(repository.DB, updateUserProfileReq, username, password, ctxUserID)
+	user, err := repository.UserRepo.UpdateUserProfileByUsernameAndUserID(repository.DB, updateUserProfileReq, *updateUserProfileReq.Username, password, ctxUserID)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return

@@ -154,23 +154,24 @@ func (repo *articleRepository) GetByOffsetAndTag(db *gorm.DB, offset, limit int,
 	return articles, nil
 }
 
-func (repo *articleRepository) GetByUserAndOffset(db *gorm.DB, offset, limit int, userID int64) ([]models.Article, error) {
+func (repo *articleRepository) GetByUserAndOffset(db *gorm.DB, offset, limit int, userID, authorID int64) ([]models.Article, error) {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*types.DEFAULT_TIMEOUT_SEC)
 	defer cancel()
 
 	var articles []models.Article
 
-	// id로 내림차순
-	err := db.WithContext(ctx).Model(&articles).
+	query := db.WithContext(ctx).Model(&articles).
 		Preload("User").
-		Preload("Likes").
 		Preload("Tags").
-		Where("user_id = ?", userID).
-		Order("id desc").
-		Offset(offset).
-		Limit(limit).
-		Find(&articles).Error
+		Where("user_id = ?", authorID).
+		Order("id desc")
+
+	if userID > 0 {
+		query.Preload("Likes", "user_id = ?", userID)
+	}
+
+	err := query.Offset(offset).Limit(limit).Find(&articles).Error
 	if err != nil {
 		return nil, err
 	}

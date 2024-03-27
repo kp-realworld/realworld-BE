@@ -128,8 +128,7 @@ func ReadArticleByOffset(w http.ResponseWriter, r *http.Request) {
 		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
-	fmt.Println("page : ", page)
-	fmt.Println("limit : ", limit)
+
 	articles, err := repository.ArticleRepo.GetByOffset(repository.DB, page, limit, userID)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
@@ -247,17 +246,17 @@ func DeleteArticle(w http.ResponseWriter, r *http.Request) {
 // @Failure 422 {object} types.ErrorResponse "요청을 제대로 수행하지 못함"
 // @Failure 500 {object} types.ErrorResponse "네트워크 에러"
 // @Router /my/articles [get]
+// (사용 X)
 func ReadMyArticleByOffset(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value("ctx_user_id").(int64)
 
-	fmt.Println("222jwioqejqiwoejqiowejqwioejiqowejiqowejiojiojio")
 	page, limit, err := util.GetOffsetAndLimit(r)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	articles, err := repository.ArticleRepo.GetByUserAndOffset(repository.DB, page, limit, userID)
+	articles, err := repository.ArticleRepo.GetByUserAndOffset(repository.DB, page, limit, userID, userID)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
@@ -444,7 +443,10 @@ func DeleteArticleLike(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} types.ErrorResponse "network error"
 // @Router /user/{author_id}/articles [get]
 func ReadArticlesByUserID(w http.ResponseWriter, r *http.Request) {
-	userID, err := util.GetIntegerParam[int64](r, "author_id")
+
+	userID := r.Context().Value("ctx_user_id").(int64)
+
+	authorID, err := util.GetIntegerParam[int64](r, "author_id")
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusBadRequest, err.Error())
 		return
@@ -456,7 +458,7 @@ func ReadArticlesByUserID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	articles, err := repository.ArticleRepo.GetByUserAndOffset(repository.DB, page, limit, userID)
+	articles, err := repository.ArticleRepo.GetByUserAndOffset(repository.DB, page, limit, userID, authorID)
 	if err != nil {
 		responder.ErrorResponse(w, http.StatusInternalServerError, err.Error())
 		return
