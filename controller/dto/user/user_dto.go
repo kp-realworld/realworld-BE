@@ -11,6 +11,7 @@ type ReadMyProfileResponseWrapperDTO struct {
 }
 
 type ReadUserProfileResponseDTO struct {
+	UserID       int64   `json:"user_id"`
 	Username     string  `json:"username"`
 	Bio          *string `json:"bio,omitempty"`
 	ProfileImage string  `json:"profile_image"`

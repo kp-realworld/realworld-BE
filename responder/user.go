@@ -32,10 +32,12 @@ func ReadUserProfileResponse(w http.ResponseWriter, user models.User, isFollowin
 
 	wrapper := userdto.ReadUserProfileResponseWrapperDTO{
 		User: userdto.ReadUserProfileResponseDTO{
+			UserID:       user.UserID,
 			Username:     user.Username,
 			Bio:          user.Bio,
 			ProfileImage: user.ProfileImage,
 			Following:    &isFollowing,
+			Email:        user.Email,
 		},
 	}
 

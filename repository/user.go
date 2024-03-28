@@ -154,8 +154,7 @@ func (repo *userRepository) UpdateUserProfileByUsernameAndUserID(db *gorm.DB, up
 	err := db.WithContext(ctx).Model(models.User{}).
 		Where(
 			&models.User{
-				Username: username,
-				UserID:   userID,
+				UserID: userID,
 			}).
 		Updates(updateData).
 		First(&user).Error

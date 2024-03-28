@@ -4,18 +4,18 @@ Name = "realworld-dev"
 Host = "realworld.cz9z95hgjl9q.ap-northeast-2.rds.amazonaws.com"
 Port = 3306
 User = "root"
-Password = ""
+Password = "!Gktrlagh33"
 
 [redis]
 Host = "localhost"
 Port = 6379
-Password = ""
+Password = "43.202.122.12"
 DB = 0
 
 [auth]
 # 리프레시 토큰 만료 기간, 액세스 토큰 만료 기간
 RefreshTokenExpire = 144
-AccessTokenExpire = 12
+AccessTokenExpire = 36
 Secret = "0b6e149dd96b303e824a2aed87f14dc4"
 Issuer = "dev-kp-realworld"
 
